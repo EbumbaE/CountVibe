@@ -9,7 +9,4 @@ type Config struct{
 	Refreshpage string `yaml:"refreshpage"`
 	Diarypage string `yaml:"diarypage"`
 	Registrationpage string `yaml:"registrationpage"`
-
-	Certfile string `yaml:"certfile"`
-	Keyfile string `yaml:"keyfile"`
 }

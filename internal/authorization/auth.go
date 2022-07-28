@@ -7,6 +7,8 @@ import (
 	
     "golang.org/x/crypto/bcrypt"
     "github.com/dgrijalva/jwt-go"
+    
+    "CountVibe/internal/database"
 )
 
 var jwtKey = []byte("my_secret_key")

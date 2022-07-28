@@ -4,6 +4,7 @@ import (
 	"CountVibe/internal/server"
 	"CountVibe/internal/config"
 	"CountVibe/internal/log"
+	"CountVibe/internal/certificate"
 )
 
 func main() { 
@@ -12,10 +13,14 @@ func main() {
 	if err != nil{
 		panic("Create logger error: " + err.Error())
 	}
-
+	
 	conf := config.CreateConfig()
 
+	certificate.SetupKeyAndCertificate(conf.Certificate)
+
 	serv := server.CreateServer(conf.Server, logger)
-	serv.Run()
+	serv.Run(conf.Certificate.Certfile, conf.Certificate.Keyfile)
+
+	
 
 }

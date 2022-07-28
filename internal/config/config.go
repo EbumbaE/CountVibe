@@ -2,10 +2,12 @@ package config
 
 import(
 	"CountVibe/internal/server"
+	"CountVibe/internal/certificate"
 )
 
 type Config struct{
 	Server server.Config `yaml:"server"`
+	Certificate certificate.Config `yaml:"certificate"`
 }
 
 func CreateConfig() Config{
@@ -19,9 +21,10 @@ func CreateConfig() Config{
 			Refreshpage: "/refresh",
 			Diarypage: "/diary",
 			Registrationpage: "/registration",
-
-			Certfile: "../../certificate/cert.pem",
-			Keyfile: "../../certificate/key.pem",
+		},
+		certificate.Config{
+			Certfile: "../../internal/certificate/cert.pem",
+			Keyfile: "../../internal/certificate/key.pem",
 		},
 	}
 }
