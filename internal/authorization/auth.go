@@ -7,7 +7,7 @@ import (
 	
     "golang.org/x/crypto/bcrypt"
     "github.com/dgrijalva/jwt-go"
-    
+
     "CountVibe/internal/database"
 )
 
@@ -23,33 +23,22 @@ type Claims struct{
     jwt.StandardClaims
 }
 
-func getPassword(username string) (password string){
+func verifyUserPass(username, password string)(bool, error) {
 	
-    password, err := hashPassword("123")
-    if err != nil{
-        return ""
+	if hasUser, err := database.CheckUserInDB(username); err != nil || !hasUser{
+        return false, err
     }
 
-    return password
-}
-
-func checkUser(username string) bool{
-	return true
-}
-
-func verifyUserPass(username, password string) bool {
-	
-	hasUser := checkUser(username)
-	if !hasUser {
-    	return false
-  	}
+  	rightPass, err := database.GetUserPassword(username)
+    if err != nil{
+        return false, err
+    }
   	
-  	rightPass := getPassword(username)
-  	if err := bcrypt.CompareHashAndPassword([]byte(rightPass), []byte(password)); err == nil {
-    	return true
+    if err := bcrypt.CompareHashAndPassword([]byte(rightPass), []byte(password)); err == nil {
+    	return true, nil
   	}
 
-  	return false
+  	return false, nil
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request){
@@ -67,7 +56,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
             username := r.FormValue("username")
             password := r.FormValue("password")
 
-            ok := verifyUserPass(username, password)
+            ok, err := verifyUserPass(username, password)
+            if err != nil{
+                fmt.Fprintf(w, err.Error())
+                return
+            }
             if !ok{
                 w.WriteHeader(http.StatusUnauthorized)
                 return
@@ -96,7 +89,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
                 Expires: expirationTime,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)
+            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)        //mmmmmmmm huita
     }
 }
 
@@ -194,10 +187,6 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request){
     })
 }
 
-func saveUser(username string, hashpassword string){
-    
-}
-
 func hashPassword(password string) (string, error){
     bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
     return string(bytes), err
@@ -218,7 +207,12 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
             username := r.FormValue("username")
             password := r.FormValue("password")
 
-            if checkUser(username){
+            hasUser, err := database.CheckUserInDB(username)
+            if err != nil{
+                fmt.Fprintf(w, err.Error())
+                return
+            }
+            if !hasUser{
                 // todo notisfaction
                 return
             }
@@ -228,7 +222,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
 
                 return
             }
-            saveUser(username, hash)
+            database.InsertNewUser(username, hash)
 
             expirationTime := time.Now().Add(5 * time.Minute)
 
@@ -253,6 +247,6 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
                 Expires: expirationTime,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)
+            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)            //mmmmmmmmm huita
     }
 }

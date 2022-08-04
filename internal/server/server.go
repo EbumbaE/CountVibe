@@ -43,7 +43,6 @@ func (s *Server) Run(Certfile string, Keyfile string){
 
 }
 
-
 func handler(w http.ResponseWriter, r *http.Request){
 	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
 }
@@ -52,7 +51,6 @@ func homehandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
             http.ServeFile(w, r, "../../static/html/home.html")
-
     }
 }
 
