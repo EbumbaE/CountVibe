@@ -7,15 +7,14 @@ import(
 
 type Database struct{
     driverConn *sql.DB
-    info string
-
+    Info string
 }
 
 var database *Database
 
-func Init()(error){
+func Init(config Database)(error){
 	
-	connectionInfo := "host=localhost port=5432 user=postgres password=1234 dbname=abobus sslmode=disable"
+	connectionInfo := config.Info
     driverConn, err := sql.Open("postgres", connectionInfo)
     if err != nil {
         return err
@@ -23,7 +22,7 @@ func Init()(error){
 
     database = &Database{
         driverConn: driverConn,
-        info: connectionInfo,
+        Info: connectionInfo,
     }
 
     return err
@@ -46,7 +45,7 @@ func Close(){
 func InsertNewUser(username, password string)(error){
     driverConn := database.driverConn
        
-    dbRequest := `INSERT INTO users (Username, Password) VALUES ($1, $2)`
+    dbRequest := `INSERT INTO users (username, password) VALUES ($1, $2)`
     _, err := driverConn.Exec(dbRequest, username, password)
 
     return err
@@ -56,7 +55,7 @@ func GetUserPassword(username string)(string, error){
     driverConn := database.driverConn
     
     dbRequest := `SELECT Username, Password FROM users WHERE Username = $1`
-    password := ""
+    var password string = ""
     err := driverConn.QueryRow(dbRequest, username).Scan(&username, &password)
 
     if err != nil{
@@ -70,23 +69,30 @@ func GetUserPassword(username string)(string, error){
 func CheckUserInDB(username string)(bool, error){
     driverConn := database.driverConn
     
-    dbRequest := `SELECT Username FROM users WHERE Username = $1`
-    err := driverConn.QueryRow(dbRequest, username).Scan(&username)
-
+    dbRequest := `SELECT username FROM users WHERE username=$1`
+    rows, err := driverConn.Query(dbRequest, username)
     if err != nil{
         return false, err
     }
-
-    if username != ""{
-        return true, err
+    rows.Next()
+    
+    var getusername string = ""
+    if err := rows.Scan(&getusername); err != nil {
+        return false, err
     }
 
-    return false, err
+    if getusername == username{
+        return true, nil 
+    }
+
+    return false, nil
 }
 
-func DeleteUser()(error){ //todo
-    dbRequest := `DELETE FROM users WHERE ID=$1`
+func DeleteUser(username string)(error){ //todo
     driverConn := database.driverConn
-    _, err := driverConn.Exec(dbRequest, 1)
+    
+    dbRequest := `DELETE FROM users WHERE username=$1`
+    _, err := driverConn.Exec(dbRequest, username)
+
     return err
 }

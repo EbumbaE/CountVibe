@@ -12,6 +12,11 @@ import (
 )
 
 var jwtKey = []byte("my_secret_key")
+const(
+    wayToStatic = "../../static/"
+    wayToLogin = wayToStatic + "html/login.html"
+    wayToRegistration = wayToStatic + "html/registration.html"
+)
 
 type User struct{
     username string `json:"username"`
@@ -33,7 +38,7 @@ func verifyUserPass(username, password string)(bool, error) {
     if err != nil{
         return false, err
     }
-  	
+
     if err := bcrypt.CompareHashAndPassword([]byte(rightPass), []byte(password)); err == nil {
     	return true, nil
   	}
@@ -44,8 +49,7 @@ func verifyUserPass(username, password string)(bool, error) {
 func LoginHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-            way := "../../static/html/login.html"
-            http.ServeFile(w, r, way)
+            http.ServeFile(w, r, wayToLogin)
         case "POST":
 
             err := r.ParseForm()
@@ -59,11 +63,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 
             ok, err := verifyUserPass(username, password)
             if err != nil{
-                fmt.Fprintf(w, err.Error())
+                fmt.Fprintf(w, "Verify error" , err.Error())
                 return
             }
             if !ok{
-                w.WriteHeader(http.StatusUnauthorized)
+                   fmt.Fprintf(w, "Incorrect login or password")
+                   w.WriteHeader(http.StatusUnauthorized)
                 return
             }
 
@@ -90,7 +95,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
                 Expires: expirationTime,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)        //mmmmmmmm huita
+            http.Redirect(w, r, "/auth", http.StatusFound)        //mmmmmmmm huita
     }
 }
 
@@ -196,8 +201,7 @@ func hashPassword(password string) (string, error){
 func RegistrationHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-            way := "../../static/html/registration.html"
-            http.ServeFile(w, r, way)
+            http.ServeFile(w, r, wayToRegistration)
         case "POST":
 
             err := r.ParseForm()
@@ -211,20 +215,24 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
 
             hasUser, err := database.CheckUserInDB(username)
             if err != nil{
-                fmt.Fprintf(w, err.Error())
+                fmt.Println("check in db", err.Error())
                 return
             }
-            if !hasUser{
+            if hasUser{
+                fmt.Fprintf(w, "User already exist")                   
                 // todo notisfaction
                 return
             }
 
             hash, err := hashPassword(password)
             if err != nil{
-
+                fmt.Println("hash password", err.Error())
                 return
             }
-            database.InsertNewUser(username, hash)
+
+            if err := database.InsertNewUser(username, hash); err != nil{
+                fmt.Println(err.Error())
+            }
 
             expirationTime := time.Now().Add(5 * time.Minute)
 
@@ -249,6 +257,6 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
                 Expires: expirationTime,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusTemporaryRedirect)            //mmmmmmmmm huita
+            http.Redirect(w, r, "/auth", http.StatusFound)            //mmmmmmmmm huita
     }
 }

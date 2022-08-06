@@ -10,20 +10,21 @@ import (
 
 func main() { 
 
+
 	logger, err := log.NewLogger("../../internal/log/l.log")
 	if err != nil{
 		panic("Create logger " + err.Error())
 	}
 
-	if err := database.Init(); err != nil{	
+	conf := config.NewConfig()
+
+	if err := database.Init(conf.Database); err != nil{	
 		logger.Error("Init database ", err)
 	}
 	ok, err := database.CheckHealth()
 	if !ok{
 		logger.Error("Responce database ", err)
 	}
-	
-	conf := config.NewConfig()
 
 	if err := certificate.SetupKeyAndCertificate(conf.Certificate); err != nil{
 		logger.Error("Setup certificate ", err)
