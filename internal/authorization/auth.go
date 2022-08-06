@@ -50,7 +50,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
 
             err := r.ParseForm()
             if err != nil {
-                fmt.Fprintf(w, "ParseForm() err: %v", err)
+                fmt.Fprintf(w, "parse form err: %v", err)
                 return
             }
 
@@ -202,7 +202,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
 
             err := r.ParseForm()
             if err != nil {
-                fmt.Fprintf(w, "ParseForm() err: %v", err)
+                fmt.Fprintf(w, "parse form err: %v", err)
                 return
             }
 

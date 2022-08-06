@@ -44,7 +44,7 @@ func (s *Server) Shutdown(){
 
 func (s *Server) beginHandler(w http.ResponseWriter, r *http.Request){
 	pages := s.Pages
-	http.Redirect(w, r, pages.Home, http.StatusTemporaryRedirect)
+	http.Redirect(w, r, pages.Home, http.StatusFound)
 }
 
 func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
@@ -52,6 +52,21 @@ func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
         case "GET":    
         	way := "../../static/html/home.html"
             http.ServeFile(w, r, way)
+        case "POST":
+        	pages := s.Pages
+
+        	err := r.ParseForm()
+            if err != nil {
+                s.Logger.Error("parse form ", err)
+                return
+            }
+            button := r.FormValue("button")
+            if button == "login"{
+            	http.Redirect(w, r, pages.Login, http.StatusFound)  
+            }
+            if button == "registration"{
+	            http.Redirect(w, r, pages.Registration, http.StatusFound)  
+            }
     }
 }
 
