@@ -44,7 +44,8 @@ func verifyUserPass(username, password string)(bool, error) {
 func LoginHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, "../../static/html/login.html")
+            way := "../../static/html/login.html"
+            http.ServeFile(w, r, way)
         case "POST":
 
             err := r.ParseForm()
@@ -195,7 +196,8 @@ func hashPassword(password string) (string, error){
 func RegistrationHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, "../../static/html/registration.html")
+            way := "../../static/html/registration.html"
+            http.ServeFile(w, r, way)
         case "POST":
 
             err := r.ParseForm()

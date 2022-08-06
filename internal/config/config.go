@@ -10,17 +10,19 @@ type Config struct{
 	Certificate certificate.Config `yaml:"certificate"`
 }
 
-func CreateConfig() Config{
+func NewConfig() Config{
 	return Config{
 		server.Config{
 			Port: ":8080",
-
-			Homepage: "/home",
-			Loginpage: "/login",
-			Authpage: "/auth",
-			Refreshpage: "/refresh",
-			Diarypage: "/diary",
-			Registrationpage: "/registration",
+			Pages: server.Pages{
+				Begin: "/",
+				Home: "/home",
+				Login: "/login",
+				Auth: "/auth",
+				Refresh: "/refresh",
+				Diary: "/diary",
+				Registration: "/registration",
+			},
 		},
 		certificate.Config{
 			Certfile: "../../internal/certificate/cert.pem",

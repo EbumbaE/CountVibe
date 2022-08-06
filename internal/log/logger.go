@@ -11,7 +11,7 @@ type FileLogger struct{
 	errorLogger *log.Logger
 }
 
-func CreateLogger(path string)(*FileLogger, error){
+func NewLogger(path string)(*FileLogger, error){
 
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {

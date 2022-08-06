@@ -7,30 +7,26 @@ import (
 	"net/http"
 )
 
+type Pages struct {
+	Begin string
+	Home string 
+	Login string 
+	Auth string 
+	Refresh string
+	Diary string
+	Registration string
+}
+
 type Server struct {
 	Port string
-
-	homepage string 
-	loginpage string 
-	authpage string 
-	refreshpage string
-	diarypage string
-	registrationpage string
-
+	Pages Pages
 	Logger log.Logger
 }
 
-func CreateServer(c Config, logger log.Logger) *Server{
+func NewServer(c Config, logger log.Logger) *Server{
 	return &Server{
 		Port: c.Port,
-
-		homepage: c.Homepage,
-		loginpage: c.Loginpage,
-		authpage: c.Authpage,
-		refreshpage: c.Refreshpage,
-		diarypage: c.Diarypage,
-		registrationpage: c.Registrationpage,
-
+		Pages: c.Pages,
 		Logger: logger,
 	}
 }
@@ -40,31 +36,37 @@ func (s *Server) Run(Certfile string, Keyfile string){
 	s.setupServerHandlers()
 	s.setupAuthHandlers()
 	s.Logger.Error(http.ListenAndServeTLS(s.Port, Certfile, Keyfile, nil))
+}
+
+func (s *Server) Shutdown(){
 
 }
 
-func handler(w http.ResponseWriter, r *http.Request){
-	http.Redirect(w, r, "/home", http.StatusTemporaryRedirect)
+func (s *Server) beginHandler(w http.ResponseWriter, r *http.Request){
+	pages := s.Pages
+	http.Redirect(w, r, pages.Home, http.StatusTemporaryRedirect)
 }
 
-func homehandler(w http.ResponseWriter, r *http.Request){
+func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, "../../static/html/home.html")
+        	way := "../../static/html/home.html"
+            http.ServeFile(w, r, way)
     }
 }
 
 func (s *Server) setupServerHandlers(){
-	http.HandleFunc("/", handler)
-	http.HandleFunc(s.homepage, homehandler)
+	pages := s.Pages
+	http.HandleFunc(pages.Begin, s.beginHandler)
+	http.HandleFunc(pages.Home, s.homeHandler)
 }
 
 
 func (s *Server) setupAuthHandlers(){
-
-    http.HandleFunc(s.authpage, authorization.AuthHandler)
-    http.HandleFunc(s.loginpage, authorization.LoginHandler)
-    http.HandleFunc(s.refreshpage, authorization.RefreshHandler)
-    http.HandleFunc(s.registrationpage, authorization.RegistrationHandler)
+	pages := s.Pages
+    http.HandleFunc(pages.Auth, authorization.AuthHandler)
+    http.HandleFunc(pages.Login, authorization.LoginHandler)
+    http.HandleFunc(pages.Refresh, authorization.RefreshHandler)
+    http.HandleFunc(pages.Registration, authorization.RegistrationHandler)
              
 }

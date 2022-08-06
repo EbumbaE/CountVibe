@@ -14,26 +14,30 @@ import (
 	"math/big"
 )
 
-func writeToFile(filename string, buf string){
+func writeToFile(filename, buf string) error{
 	file, err := os.Create(filename)
 	if (err != nil){
-		panic(err)
+		return err
 	}
+	defer file.Close()
 	file.WriteString(buf)
-	file.Close()
+	
+	return nil
 }
 
-func generateKeyAndCertificate(keyfile string, certfile string){
+func generateKeyAndCertificate(keyfile, certfile string) error{
 
 	privatekey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	bufkey, _ := x509.MarshalECPrivateKey(privatekey)
 	out := &bytes.Buffer{}
 	pem.Encode(out,  &pem.Block{Type: "EC PRIVATE KEY", Bytes: bufkey})
-	writeToFile(keyfile, out.String())
+	if err := writeToFile(keyfile, out.String()); err != nil{
+		return err
+	}
 
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2022),
@@ -53,13 +57,16 @@ func generateKeyAndCertificate(keyfile string, certfile string){
 
 	certificate, err := x509.CreateCertificate(rand.Reader, ca, ca, &privatekey.PublicKey, privatekey)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	out.Reset()
 	pem.Encode(out, &pem.Block{Type: "CERTIFICATE", Bytes: certificate})
-	writeToFile(certfile, out.String())
+	if err := writeToFile(certfile, out.String()); err != nil{
+		return err
+	}
 
+	return nil
 }
 
 func tryToOpenFile(f string) bool{
@@ -70,11 +77,15 @@ func tryToOpenFile(f string) bool{
 	return true
 }
 
-func SetupKeyAndCertificate(c Config){
+func SetupKeyAndCertificate(c Config) error{
 
 	tryopen := tryToOpenFile(c.Certfile) && tryToOpenFile(c.Keyfile)
 	if (!tryopen){
-		generateKeyAndCertificate(c.Keyfile, c.Certfile)
+		err := generateKeyAndCertificate(c.Keyfile, c.Certfile)
+		if err != nil{
+			return err
+		}
 	}
 
+	return nil
 }
