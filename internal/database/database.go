@@ -54,7 +54,7 @@ func InsertNewUser(username, password string)(error){
 func GetUserPassword(username string)(string, error){
     driverConn := database.driverConn
     
-    dbRequest := `SELECT Username, Password FROM users WHERE Username = $1`
+    dbRequest := `SELECT Username, Password FROM users WHERE Username=$1`
     var password string = ""
     err := driverConn.QueryRow(dbRequest, username).Scan(&username, &password)
 

@@ -1,7 +1,0 @@
-package authorization
-
-import "testing"
-
-func TestverifyUserPass(t *testing.T){
-	
-}

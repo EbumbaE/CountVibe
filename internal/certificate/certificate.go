@@ -46,12 +46,12 @@ func generateKeyAndCertificate(keyfile, certfile string) error{
 			Country:       []string{"RU"},
 			Locality:      []string{"Moscow"},
 		},
-		IPAddresses:  		   []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		IsCA:                  true,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		IPAddresses: []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
+		NotBefore: time.Now(),
+		NotAfter: time.Now().AddDate(10, 0, 0),
+		IsCA: true,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
 

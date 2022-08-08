@@ -1,4 +1,4 @@
-package authorization
+package session
 
 import (
 	"fmt"
@@ -10,19 +10,6 @@ import (
 
     "CountVibe/internal/database"
 )
-
-var jwtKey = []byte("my_secret_key")
-const(
-    wayToStatic = "../../static/"
-    wayToLogin = wayToStatic + "html/login.html"
-    wayToRegistration = wayToStatic + "html/registration.html"
-)
-
-type User struct{
-    username string `json:"username"`
-    password string `json:"password"`
-}
-
 type Claims struct{
     Username string `json:"username"`
     jwt.StandardClaims
@@ -99,99 +86,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
     }
 }
 
-func AuthHandler(w http.ResponseWriter, r *http.Request){
-	
-    c, err := r.Cookie("token")
-    if err != nil {
-        if err == http.ErrNoCookie {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    tokenString := c.Value
-
-    claims := &Claims{}
-
-    token, err := jwt.ParseWithClaims(tokenString, claims, 
-        func(token *jwt.Token) (interface{}, error) {
-            return jwtKey, nil
-        })
-    if err != nil {
-        if err == jwt.ErrSignatureInvalid {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    if !token.Valid {
-        w.WriteHeader(http.StatusUnauthorized)
-        return
-    }
-
-    w.Write([]byte(fmt.Sprintf("You are authorize %s!", claims.Username)))
-
-}
-
-func RefreshHandler(w http.ResponseWriter, r *http.Request){
-
-    c, err := r.Cookie("token")
-    if err != nil {
-        if err == http.ErrNoCookie {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    tokenString := c.Value
-    claims := &Claims{}
-
-    token, err := jwt.ParseWithClaims(tokenString, claims, 
-        func(token *jwt.Token) (interface{}, error) {
-            return jwtKey, nil
-        })
-    if err != nil {
-        if err == jwt.ErrSignatureInvalid {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    if !token.Valid {
-        w.WriteHeader(http.StatusUnauthorized)
-        return
-    }
-    
-    if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    expirationTime := time.Now().Add(5 * time.Minute)
-    claims.ExpiresAt = expirationTime.Unix()
-    
-    updtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    
-    updtokenString, err := updtoken.SignedString(jwtKey)
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        return
-    }
-
-    http.SetCookie(w, &http.Cookie{
-        Name:    "token",
-        Value:   updtokenString,
-        Expires: expirationTime,
-    })
-}
 
 func hashPassword(password string) (string, error){
     bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -259,4 +153,103 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
 
             http.Redirect(w, r, "/auth", http.StatusFound)            //mmmmmmmmm huita
     }
+}
+
+func AuthHandler(w http.ResponseWriter, r *http.Request){
+	
+    c, err := r.Cookie("token")
+    if err != nil {
+        if err == http.ErrNoCookie {
+            w.WriteHeader(http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    tokenString := c.Value
+
+    claims := &Claims{}
+
+    token, err := jwt.ParseWithClaims(tokenString, claims, 
+        func(token *jwt.Token) (interface{}, error) {
+            return jwtKey, nil
+        })
+    if err != nil {
+        if err == jwt.ErrSignatureInvalid {
+            w.WriteHeader(http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    if !token.Valid {
+        w.WriteHeader(http.StatusUnauthorized)
+        return
+    }
+
+    urlUser := "/" + claims.Username
+    http.HandleFunc(urlUser, userHandler)
+
+    urlDiary := urlUser + "/diary"
+    http.HandleFunc(urlDiary, diaryHandler)
+
+    http.Redirect(w, r, urlUser, http.StatusFound)
+}
+
+func RefreshHandler(w http.ResponseWriter, r *http.Request){
+
+    c, err := r.Cookie("token")
+    if err != nil {
+        if err == http.ErrNoCookie {
+            w.WriteHeader(http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    tokenString := c.Value
+    claims := &Claims{}
+
+    token, err := jwt.ParseWithClaims(tokenString, claims, 
+        func(token *jwt.Token) (interface{}, error) {
+            return jwtKey, nil
+        })
+    if err != nil {
+        if err == jwt.ErrSignatureInvalid {
+            w.WriteHeader(http.StatusUnauthorized)
+            return
+        }
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    if !token.Valid {
+        w.WriteHeader(http.StatusUnauthorized)
+        return
+    }
+    
+    if time.Unix(claims.ExpiresAt, 0).Sub(time.Now()) > 30*time.Second {
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    expirationTime := time.Now().Add(5 * time.Minute)
+    claims.ExpiresAt = expirationTime.Unix()
+    
+    updtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    
+    updtokenString, err := updtoken.SignedString(jwtKey)
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    http.SetCookie(w, &http.Cookie{
+        Name:    "token",
+        Value:   updtokenString,
+        Expires: expirationTime,
+    })
 }

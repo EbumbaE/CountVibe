@@ -1,21 +1,11 @@
 package server
 
 import (
-	"CountVibe/internal/authorization"
+	"CountVibe/internal/session"
 	"CountVibe/internal/log"
 
 	"net/http"
 )
-
-type Pages struct {
-	Begin string
-	Home string 
-	Login string 
-	Auth string 
-	Refresh string
-	Diary string
-	Registration string
-}
 
 type Server struct {
 	Port string
@@ -79,9 +69,9 @@ func (s *Server) setupServerHandlers(){
 
 func (s *Server) setupAuthHandlers(){
 	pages := s.Pages
-    http.HandleFunc(pages.Auth, authorization.AuthHandler)
-    http.HandleFunc(pages.Login, authorization.LoginHandler)
-    http.HandleFunc(pages.Refresh, authorization.RefreshHandler)
-    http.HandleFunc(pages.Registration, authorization.RegistrationHandler)
+    http.HandleFunc(pages.Auth, session.AuthHandler)
+    http.HandleFunc(pages.Login, session.LoginHandler)
+    http.HandleFunc(pages.Refresh, session.RefreshHandler)
+    http.HandleFunc(pages.Registration, session.RegistrationHandler)
              
 }
