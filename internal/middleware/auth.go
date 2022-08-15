@@ -1,4 +1,4 @@
-package session
+package middleware
 
 import (
 	"fmt"
@@ -10,9 +10,30 @@ import (
 
     "CountVibe/internal/database"
 )
+
 type Claims struct{
     Username string `json:"username"`
     jwt.StandardClaims
+}
+
+type Middleware struct{
+    pages map[string]string
+    paths WayTo
+    formatsPath FormatsPath
+    jwtKey []byte 
+}
+
+func NewMiddleware(c Config, confpages map[string]string) *Middleware{
+    return &Middleware{
+        paths: c.Paths,
+        jwtKey: c.JwtKey,
+        formatsPath: c.FormatsPath,
+        pages: confpages,
+    }
+}
+
+func (mw Middleware) Run(){
+    mw.SetupMiddlewareHandlers()
 }
 
 func verifyUserPass(username, password string)(bool, error) {
@@ -33,10 +54,51 @@ func verifyUserPass(username, password string)(bool, error) {
   	return false, nil
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request){
+func LoginVerification(r *http.Request, jwtKey []byte) (bool, *Claims){
+    c, err := r.Cookie("token")
+    if err != nil {
+        return false, &Claims{}
+    }
+
+    tokenString := c.Value
+
+    claims := &Claims{}
+
+    token, err := jwt.ParseWithClaims(tokenString, claims, 
+        func(token *jwt.Token) (any, error) {
+            return jwtKey, nil
+        })
+
+    if err != nil || !token.Valid {
+        return false, &Claims{}
+    }
+    
+    return true, claims
+}
+
+func createToken(claims *Claims, jwtKey []byte)(string, error){
+
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    
+    tokenString, err := token.SignedString(jwtKey)
+    if err != nil {
+        return "", err
+    }
+
+    return tokenString, nil
+}
+
+func (mw *Middleware) LoginHandler(w http.ResponseWriter, r *http.Request){
+
+    ok, claims := LoginVerification(r, mw.jwtKey)
+    if ok{
+        url := "/" + claims.Username
+        http.Redirect(w, r, url, http.StatusFound)
+    }
+
     switch r.Method {
-        case "GET":    
-            http.ServeFile(w, r, wayToLogin)
+        case "GET": 
+            http.ServeFile(w, r, mw.paths.Login)
         case "POST":
 
             err := r.ParseForm()
@@ -60,7 +122,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
             }
 
             expirationTime := time.Now().Add(5 * time.Minute)
-
             claims := &Claims{
                 Username: username,
                 StandardClaims: jwt.StandardClaims{
@@ -68,34 +129,33 @@ func LoginHandler(w http.ResponseWriter, r *http.Request){
                 },
             }
 
-            token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-            
-            tokenString, err := token.SignedString(jwtKey)
-            if err != nil {
+            token, err := createToken(claims, mw.jwtKey)
+            if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
             }
 
             http.SetCookie(w, &http.Cookie{
                 Name:    "token",
-                Value:   tokenString,
+                Value:   token,
                 Expires: expirationTime,
+                HttpOnly: true,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusFound)        //mmmmmmmm huita
+            http.Redirect(w, r, mw.pages["auth"], http.StatusFound) 
     }
 }
-
 
 func hashPassword(password string) (string, error){
     bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
     return string(bytes), err
 }
 
-func RegistrationHandler(w http.ResponseWriter, r *http.Request){
+func (mw *Middleware) RegistrationHandler(w http.ResponseWriter, r *http.Request){
+
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, wayToRegistration)
+            http.ServeFile(w, r, mw.paths.Registration)
         case "POST":
 
             err := r.ParseForm()
@@ -129,7 +189,6 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
             }
 
             expirationTime := time.Now().Add(5 * time.Minute)
-
             claims := &Claims{
                 Username: username,
                 StandardClaims: jwt.StandardClaims{
@@ -137,26 +196,25 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request){
                 },
             }
 
-            token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-            
-            tokenString, err := token.SignedString(jwtKey)
-            if err != nil {
+            token, err := createToken(claims, mw.jwtKey)
+            if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
             }
 
             http.SetCookie(w, &http.Cookie{
                 Name:    "token",
-                Value:   tokenString,
+                Value:   token,
                 Expires: expirationTime,
+                HttpOnly: true,
             })
 
-            http.Redirect(w, r, "/auth", http.StatusFound)            //mmmmmmmmm huita
+            http.Redirect(w, r, mw.pages["auth"], http.StatusFound)            
     }
 }
 
-func AuthHandler(w http.ResponseWriter, r *http.Request){
-	
+func (mw *Middleware) AuthHandler(w http.ResponseWriter, r *http.Request){
+
     c, err := r.Cookie("token")
     if err != nil {
         if err == http.ErrNoCookie {
@@ -172,8 +230,8 @@ func AuthHandler(w http.ResponseWriter, r *http.Request){
     claims := &Claims{}
 
     token, err := jwt.ParseWithClaims(tokenString, claims, 
-        func(token *jwt.Token) (interface{}, error) {
-            return jwtKey, nil
+        func(token *jwt.Token) (any, error) {
+            return mw.jwtKey, nil
         })
     if err != nil {
         if err == jwt.ErrSignatureInvalid {
@@ -187,18 +245,32 @@ func AuthHandler(w http.ResponseWriter, r *http.Request){
     if !token.Valid {
         w.WriteHeader(http.StatusUnauthorized)
         return
-    }
+    }   
 
-    urlUser := "/" + claims.Username
-    http.HandleFunc(urlUser, userHandler)
+    formats := mw.formatsPath
 
-    urlDiary := urlUser + "/diary"
-    http.HandleFunc(urlDiary, diaryHandler)
+    urlProfile := fmt.Sprintf(formats.Profile, claims.Username)
+    http.HandleFunc(urlProfile, mw.userHandler)
 
-    http.Redirect(w, r, urlUser, http.StatusFound)
+    urlDiary := fmt.Sprintf(formats.Diary, claims.Username)
+    http.HandleFunc(urlDiary, mw.diaryHandler)
+
+    http.Redirect(w, r, urlProfile, http.StatusFound)
+
 }
 
-func RefreshHandler(w http.ResponseWriter, r *http.Request){
+func updateToken(claims *Claims, jwtKey []byte) (string, error){
+    
+    updtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+    
+    updtokenString, err := updtoken.SignedString(jwtKey)
+    if err != nil {
+        return "", err
+    }
+    return updtokenString, nil
+}
+
+func (mw *Middleware) RefreshHandler(w http.ResponseWriter, r *http.Request){
 
     c, err := r.Cookie("token")
     if err != nil {
@@ -215,7 +287,7 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request){
 
     token, err := jwt.ParseWithClaims(tokenString, claims, 
         func(token *jwt.Token) (interface{}, error) {
-            return jwtKey, nil
+            return mw.jwtKey, nil
         })
     if err != nil {
         if err == jwt.ErrSignatureInvalid {
@@ -238,18 +310,24 @@ func RefreshHandler(w http.ResponseWriter, r *http.Request){
 
     expirationTime := time.Now().Add(5 * time.Minute)
     claims.ExpiresAt = expirationTime.Unix()
-    
-    updtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    
-    updtokenString, err := updtoken.SignedString(jwtKey)
-    if err != nil {
+
+    updToken, err := updateToken(claims, mw.jwtKey)
+    if err != nil{
         w.WriteHeader(http.StatusInternalServerError)
-        return
     }
 
     http.SetCookie(w, &http.Cookie{
         Name:    "token",
-        Value:   updtokenString,
+        Value:   updToken,
         Expires: expirationTime,
+        HttpOnly: true,
     })
+}
+
+func (mw *Middleware) SetupMiddlewareHandlers(){
+    pages := mw.pages
+    http.HandleFunc(pages["auth"], mw.AuthHandler)
+    http.HandleFunc(pages["login"], mw.LoginHandler)
+    http.HandleFunc(pages["registration"], mw.RegistrationHandler)
+    http.HandleFunc(pages["refresh"], mw.RefreshHandler)         
 }

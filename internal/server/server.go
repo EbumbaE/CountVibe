@@ -1,7 +1,6 @@
 package server
 
 import (
-	"CountVibe/internal/session"
 	"CountVibe/internal/log"
 
 	"net/http"
@@ -9,32 +8,26 @@ import (
 
 type Server struct {
 	Port string
-	Pages Pages
+	pages map[string]string
 	Logger log.Logger
 }
 
-func NewServer(c Config, logger log.Logger) *Server{
+func NewServer(c Config, cpages map[string]string, logger log.Logger) *Server{
 	return &Server{
 		Port: c.Port,
-		Pages: c.Pages,
+		pages: cpages,
 		Logger: logger,
 	}
 }
 
-func (s *Server) Run(Certfile string, Keyfile string){
-
+func (s *Server) Run(Certfile, Keyfile string){
 	s.setupServerHandlers()
-	s.setupAuthHandlers()
 	s.Logger.Error(http.ListenAndServeTLS(s.Port, Certfile, Keyfile, nil))
 }
 
-func (s *Server) Shutdown(){
-
-}
-
 func (s *Server) beginHandler(w http.ResponseWriter, r *http.Request){
-	pages := s.Pages
-	http.Redirect(w, r, pages.Home, http.StatusFound)
+	pages := s.pages
+	http.Redirect(w, r, pages["home"], http.StatusFound)
 }
 
 func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
@@ -43,7 +36,7 @@ func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
         	way := "../../static/html/home.html"
             http.ServeFile(w, r, way)
         case "POST":
-        	pages := s.Pages
+        	pages := s.pages
 
         	err := r.ParseForm()
             if err != nil {
@@ -52,26 +45,16 @@ func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
             }
             button := r.FormValue("button")
             if button == "login"{
-            	http.Redirect(w, r, pages.Login, http.StatusFound)  
+            	http.Redirect(w, r, pages["login"], http.StatusFound)  
             }
             if button == "registration"{
-	            http.Redirect(w, r, pages.Registration, http.StatusFound)  
+	            http.Redirect(w, r, pages["registration"], http.StatusFound)  
             }
     }
 }
 
 func (s *Server) setupServerHandlers(){
-	pages := s.Pages
-	http.HandleFunc(pages.Begin, s.beginHandler)
-	http.HandleFunc(pages.Home, s.homeHandler)
-}
-
-
-func (s *Server) setupAuthHandlers(){
-	pages := s.Pages
-    http.HandleFunc(pages.Auth, session.AuthHandler)
-    http.HandleFunc(pages.Login, session.LoginHandler)
-    http.HandleFunc(pages.Refresh, session.RefreshHandler)
-    http.HandleFunc(pages.Registration, session.RegistrationHandler)
-             
+	pages := s.pages
+	http.HandleFunc(pages["begin"], s.beginHandler)
+	http.HandleFunc(pages["home"], s.homeHandler)
 }

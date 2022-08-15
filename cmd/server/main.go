@@ -2,6 +2,7 @@ package main
 
 import (
 	"CountVibe/internal/server"
+	"CountVibe/internal/middleware"
 	"CountVibe/internal/config"
 	"CountVibe/internal/log"
 	"CountVibe/internal/certificate"
@@ -30,7 +31,10 @@ func main() {
 		logger.Error("Setup certificate ", err)
 	}
 
-	serv := server.NewServer(conf.Server, logger)
+	mw := middleware.NewMiddleware(conf.Middleware, conf.Pages)
+	mw.Run()
+
+	serv := server.NewServer(conf.Server, conf.Pages, logger)
 	serv.Run(conf.Certificate.Certfile, conf.Certificate.Keyfile)
 
 }
