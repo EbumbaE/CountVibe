@@ -1,4 +1,4 @@
-package middleware
+package authorization
 
 import (
 	"fmt"
@@ -16,24 +16,32 @@ type Claims struct{
     jwt.StandardClaims
 }
 
-type Middleware struct{
+type Authorization struct{
     pages map[string]string
-    paths WayTo
-    formatsPath FormatsPath
+    paths map[string]string
+    formatsPages map[string]string
     jwtKey []byte 
 }
 
-func NewMiddleware(c Config, confpages map[string]string) *Middleware{
-    return &Middleware{
+func NewAuthorization(c Config, confpages map[string]string) *Authorization{
+    return &Authorization{
         paths: c.Paths,
         jwtKey: c.JwtKey,
-        formatsPath: c.FormatsPath,
+        formatsPages: c.FormatsPages,
         pages: confpages,
     }
 }
 
-func (mw Middleware) Run(){
-    mw.SetupMiddlewareHandlers()
+func (a *Authorization) setupAuthorizationHandlers(){
+    pages := a.pages
+    http.HandleFunc(pages["auth"], a.authHandler)
+    http.HandleFunc(pages["login"], a.loginHandler)
+    http.HandleFunc(pages["registration"], a.registrationHandler)
+    http.HandleFunc(pages["refresh"], a.refreshHandler)         
+}
+
+func (a Authorization) Run(){
+    a.setupAuthorizationHandlers()
 }
 
 func verifyUserPass(username, password string)(bool, error) {
@@ -88,9 +96,9 @@ func createToken(claims *Claims, jwtKey []byte)(string, error){
     return tokenString, nil
 }
 
-func (mw *Middleware) LoginHandler(w http.ResponseWriter, r *http.Request){
+func (a *Authorization) loginHandler(w http.ResponseWriter, r *http.Request){
 
-    ok, claims := LoginVerification(r, mw.jwtKey)
+    ok, claims := LoginVerification(r, a.jwtKey)
     if ok{
         url := "/" + claims.Username
         http.Redirect(w, r, url, http.StatusFound)
@@ -98,7 +106,7 @@ func (mw *Middleware) LoginHandler(w http.ResponseWriter, r *http.Request){
 
     switch r.Method {
         case "GET": 
-            http.ServeFile(w, r, mw.paths.Login)
+            http.ServeFile(w, r, a.paths["login"])
         case "POST":
 
             err := r.ParseForm()
@@ -129,7 +137,7 @@ func (mw *Middleware) LoginHandler(w http.ResponseWriter, r *http.Request){
                 },
             }
 
-            token, err := createToken(claims, mw.jwtKey)
+            token, err := createToken(claims, a.jwtKey)
             if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
@@ -142,7 +150,7 @@ func (mw *Middleware) LoginHandler(w http.ResponseWriter, r *http.Request){
                 HttpOnly: true,
             })
 
-            http.Redirect(w, r, mw.pages["auth"], http.StatusFound) 
+            http.Redirect(w, r, a.pages["auth"], http.StatusFound) 
     }
 }
 
@@ -151,11 +159,11 @@ func hashPassword(password string) (string, error){
     return string(bytes), err
 }
 
-func (mw *Middleware) RegistrationHandler(w http.ResponseWriter, r *http.Request){
+func (a *Authorization) registrationHandler(w http.ResponseWriter, r *http.Request){
 
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, mw.paths.Registration)
+            http.ServeFile(w, r, a.paths["registration"])
         case "POST":
 
             err := r.ParseForm()
@@ -196,7 +204,7 @@ func (mw *Middleware) RegistrationHandler(w http.ResponseWriter, r *http.Request
                 },
             }
 
-            token, err := createToken(claims, mw.jwtKey)
+            token, err := createToken(claims, a.jwtKey)
             if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
@@ -209,11 +217,11 @@ func (mw *Middleware) RegistrationHandler(w http.ResponseWriter, r *http.Request
                 HttpOnly: true,
             })
 
-            http.Redirect(w, r, mw.pages["auth"], http.StatusFound)            
+            http.Redirect(w, r, a.pages["auth"], http.StatusFound)            
     }
 }
 
-func (mw *Middleware) AuthHandler(w http.ResponseWriter, r *http.Request){
+func (a *Authorization) authHandler(w http.ResponseWriter, r *http.Request){
 
     c, err := r.Cookie("token")
     if err != nil {
@@ -231,7 +239,7 @@ func (mw *Middleware) AuthHandler(w http.ResponseWriter, r *http.Request){
 
     token, err := jwt.ParseWithClaims(tokenString, claims, 
         func(token *jwt.Token) (any, error) {
-            return mw.jwtKey, nil
+            return a.jwtKey, nil
         })
     if err != nil {
         if err == jwt.ErrSignatureInvalid {
@@ -247,14 +255,14 @@ func (mw *Middleware) AuthHandler(w http.ResponseWriter, r *http.Request){
         return
     }   
 
-    formats := mw.formatsPath
+    formats := a.formatsPages
+            
+    urlProfile := fmt.Sprintf(formats["profile"], claims.Username)
+    http.HandleFunc(urlProfile, a.userHandler)
 
-    urlProfile := fmt.Sprintf(formats.Profile, claims.Username)
-    http.HandleFunc(urlProfile, mw.userHandler)
-
-    urlDiary := fmt.Sprintf(formats.Diary, claims.Username)
-    http.HandleFunc(urlDiary, mw.diaryHandler)
-
+    urlDiary := fmt.Sprintf(formats["diary"], claims.Username)
+    http.HandleFunc(urlDiary, a.diaryHandler)
+    
     http.Redirect(w, r, urlProfile, http.StatusFound)
 
 }
@@ -270,7 +278,7 @@ func updateToken(claims *Claims, jwtKey []byte) (string, error){
     return updtokenString, nil
 }
 
-func (mw *Middleware) RefreshHandler(w http.ResponseWriter, r *http.Request){
+func (a *Authorization) refreshHandler(w http.ResponseWriter, r *http.Request){
 
     c, err := r.Cookie("token")
     if err != nil {
@@ -287,7 +295,7 @@ func (mw *Middleware) RefreshHandler(w http.ResponseWriter, r *http.Request){
 
     token, err := jwt.ParseWithClaims(tokenString, claims, 
         func(token *jwt.Token) (interface{}, error) {
-            return mw.jwtKey, nil
+            return a.jwtKey, nil
         })
     if err != nil {
         if err == jwt.ErrSignatureInvalid {
@@ -311,7 +319,7 @@ func (mw *Middleware) RefreshHandler(w http.ResponseWriter, r *http.Request){
     expirationTime := time.Now().Add(5 * time.Minute)
     claims.ExpiresAt = expirationTime.Unix()
 
-    updToken, err := updateToken(claims, mw.jwtKey)
+    updToken, err := updateToken(claims, a.jwtKey)
     if err != nil{
         w.WriteHeader(http.StatusInternalServerError)
     }
@@ -322,12 +330,4 @@ func (mw *Middleware) RefreshHandler(w http.ResponseWriter, r *http.Request){
         Expires: expirationTime,
         HttpOnly: true,
     })
-}
-
-func (mw *Middleware) SetupMiddlewareHandlers(){
-    pages := mw.pages
-    http.HandleFunc(pages["auth"], mw.AuthHandler)
-    http.HandleFunc(pages["login"], mw.LoginHandler)
-    http.HandleFunc(pages["registration"], mw.RegistrationHandler)
-    http.HandleFunc(pages["refresh"], mw.RefreshHandler)         
 }

@@ -9,6 +9,7 @@ import (
 type Server struct {
 	Port string
 	pages map[string]string
+	paths map[string]string
 	Logger log.Logger
 }
 
@@ -16,6 +17,7 @@ func NewServer(c Config, cpages map[string]string, logger log.Logger) *Server{
 	return &Server{
 		Port: c.Port,
 		pages: cpages,
+		paths: c.Paths,
 		Logger: logger,
 	}
 }
@@ -33,8 +35,7 @@ func (s *Server) beginHandler(w http.ResponseWriter, r *http.Request){
 func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
     switch r.Method {
         case "GET":    
-        	way := "../../static/html/home.html"
-            http.ServeFile(w, r, way)
+            http.ServeFile(w, r, s.paths["home"])
         case "POST":
         	pages := s.pages
 
