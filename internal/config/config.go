@@ -4,13 +4,13 @@ import(
 	"CountVibe/internal/server"
 	"CountVibe/internal/certificate"
 	"CountVibe/internal/database"
-	"CountVibe/internal/authorization"
+	"CountVibe/internal/session"
 )
 
 type Config struct{
 	Pages map[string]string `yaml:"pages"`
 	Server server.Config `yaml:"server"`
-	Authorization authorization.Config `yaml:"middleware"`
+	Session session.Config `yaml:"middleware"`
 	Certificate certificate.Config `yaml:"certificate"`
 	Database database.Database
 }
@@ -31,7 +31,7 @@ func NewConfig() Config{
 			    "home": "../../static/html/home.html",
 			},
 		},
-		Authorization: authorization.Config{
+		Session: session.Config{
 			Paths: map[string]string{
 			    "static": 		"../../static/",
 		    	"login": 		"../../static/html/login.html",
@@ -43,7 +43,10 @@ func NewConfig() Config{
 				"profile": "/%s",
 				"diary": "/%s/diary", 
 			},
-			JwtKey: []byte("my_secret_key"),
+			JwtKey: map[string][]byte{
+				"access": []byte("birimborom"),
+				"refresh": []byte("barumbombom"),
+			},
 		},
 		Certificate: certificate.Config{
 			Certfile: "../../internal/certificate/cert.pem",

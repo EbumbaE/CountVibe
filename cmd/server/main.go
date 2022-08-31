@@ -2,7 +2,7 @@ package main
 
 import (
 	"CountVibe/internal/server"
-	"CountVibe/internal/authorization"
+	"CountVibe/internal/session"
 	"CountVibe/internal/config"
 	"CountVibe/internal/log"
 	"CountVibe/internal/certificate"
@@ -18,7 +18,7 @@ func main() {
 
 	conf := config.NewConfig()
 
-	if err := database.Init(conf.Database); err != nil{	
+	if err := database.Init(conf.Database); err != nil{
 		logger.Error("Init database ", err)
 	}
 	ok, err := database.CheckHealth()
@@ -30,8 +30,8 @@ func main() {
 		logger.Error("Setup certificate ", err)
 	}
 
-	a := authorization.NewAuthorization(conf.Authorization, conf.Pages)
-	a.Run()
+	au := session.NewSession(conf.Session, conf.Pages, logger)
+	au.Run()
 
 	serv := server.NewServer(conf.Server, conf.Pages, logger)
 	serv.Run(conf.Certificate.Certfile, conf.Certificate.Keyfile)
