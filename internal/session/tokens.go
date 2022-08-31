@@ -70,7 +70,7 @@ func (s *Session)deleteAuthorization(givenUuid string)(int64, error){
 
 func (s *Session)deleteTokens(ad *AuthDetails)(error){
 
-    refreshUuid := fmt.Sprintf("%s++%d", ad.accessUuid, ad.userID)
+    refreshUuid := fmt.Sprintf("%s::%d", ad.accessUuid, ad.userID)
     
     deletedAccess, errDA := s.tokensDB.Del(ad.accessUuid).Result()
     if errDA != nil {

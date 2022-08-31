@@ -29,7 +29,7 @@ func deleteCookie(w http.ResponseWriter){
     http.SetCookie(w, access)
 
     refresh := &http.Cookie{
-        Name: "access_token",
+        Name: "refresh_token",
         MaxAge: -1,
     }
     http.SetCookie(w, refresh)

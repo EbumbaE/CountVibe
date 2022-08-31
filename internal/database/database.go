@@ -76,23 +76,46 @@ func CheckUserInDB(username string)(bool, error){
     }
     rows.Next()
     
-    var getusername string = ""
-    if err := rows.Scan(&getusername); err != nil {
+    var getUsername string = ""
+    if err := rows.Scan(&getUsername); err != nil {
         return false, err
     }
 
-    if getusername == username{
+    if getUsername == username{
         return true, nil 
     }
 
     return false, nil
 }
 
-func DeleteUser(username string)(error){ //todo
+func DeleteUser(username string)(error){       //todo
     driverConn := database.driverConn
     
     dbRequest := `DELETE FROM users WHERE username=$1`
     _, err := driverConn.Exec(dbRequest, username)
 
     return err
+}
+
+func GetAllUsernames()([]string, error){       //so bad
+    driverConn := database.driverConn
+    
+    dbRequest := `SELECT username FROM users`
+    rows, err := driverConn.Query(dbRequest)
+    if err != nil{
+        return nil, err
+    }
+
+    var getUsername string = ""
+    var usernames []string
+
+    for rows.Next(){
+        if err := rows.Scan(&getUsername); err != nil {
+            return nil, err
+        }   
+        usernames = append(usernames, getUsername)
+    }
+
+    return usernames, nil
+
 }

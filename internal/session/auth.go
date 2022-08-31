@@ -43,28 +43,28 @@ func (s *Session) setupDefaultHandlers(){
     http.HandleFunc(pages["refresh"], s.refreshHandler)     
 }
 
-func (s *Session) rebornUserHandlers(){
+func (s *Session) restoreUserHandlers(){
     
     formats := s.formatsPages
     
-    users := []User{                                              //test
-        {
-            username: "Ebumba",
-        },
+    usernames, err := database.GetAllUsernames()
+    if err != nil{
+        s.Logger.Error(err, "get all usernames")
+        return
     }
 
-    for _, user := range users{
-        urlProfile := fmt.Sprintf(formats["profile"], user.username)
-        http.HandleFunc(urlProfile, s.userHandler)
+    for _, username := range usernames{
+        urlProfile := fmt.Sprintf(formats["profile"], username)
+        urlDiary := fmt.Sprintf(formats["diary"], username)
 
-        urlDiary := fmt.Sprintf(formats["diary"], user.username)
+        http.HandleFunc(urlProfile, s.userHandler)
         http.HandleFunc(urlDiary, s.diaryHandler)
     }
 }
 
 func (s *Session) setupSessionHandlers(){
     s.setupDefaultHandlers()
-    s.rebornUserHandlers()
+    s.restoreUserHandlers()
 }
 
 func (s *Session) Run(){
@@ -95,8 +95,8 @@ func verifyUserPass(username, password string)(bool, error) {
 }
 
 func LoginVerification(r *http.Request, jwtKey map[string][]byte) (bool, error){
-    c, ok := r.Cookie("access_token")
-    if ok != nil {
+    c, err := r.Cookie("access_token")
+    if err != nil {
         return false, nil
     }
 
