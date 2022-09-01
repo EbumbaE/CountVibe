@@ -42,19 +42,47 @@ func Close(){
     driverConn.Close()
 }
 
-func InsertNewUser(username, password string)(error){
+func InsertNewUser(id, username, password string)(error){
     driverConn := database.driverConn
        
-    dbRequest := `INSERT INTO users (username, password) VALUES ($1, $2)`
-    _, err := driverConn.Exec(dbRequest, username, password)
+    dbRequest := `INSERT INTO users (id, username, password) VALUES ($1, $2, $3)`
+    _, err := driverConn.Exec(dbRequest, id, username, password)
 
     return err
+}
+
+func GetUsername(userID string)(string, error){
+    driverConn := database.driverConn
+    
+    dbRequest := `SELECT id, username FROM users WHERE id=$1`
+    var username string = ""
+    err := driverConn.QueryRow(dbRequest, userID).Scan(&userID, &username)
+
+    if err != nil{
+        return "", err
+    }
+    
+    return username, err   
+}
+
+func GetUserID(username string)(string, error){
+    driverConn := database.driverConn
+    
+    dbRequest := `SELECT id, username FROM users WHERE username=$1`
+    var userID string = ""
+    err := driverConn.QueryRow(dbRequest, username).Scan(&userID, &username)
+
+    if err != nil{
+        return "", err
+    }
+    
+    return userID, err   
 }
 
 func GetUserPassword(username string)(string, error){
     driverConn := database.driverConn
     
-    dbRequest := `SELECT Username, Password FROM users WHERE Username=$1`
+    dbRequest := `SELECT username, password FROM users WHERE username=$1`
     var password string = ""
     err := driverConn.QueryRow(dbRequest, username).Scan(&username, &password)
 
@@ -66,7 +94,7 @@ func GetUserPassword(username string)(string, error){
 
 }
 
-func CheckUserInDB(username string)(bool, error){
+func CheckUsernameInDB(username string)(bool, error){
     driverConn := database.driverConn
     
     dbRequest := `SELECT username FROM users WHERE username=$1`

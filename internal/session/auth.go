@@ -14,30 +14,30 @@ import (
 )
 
 type Session struct{
-    user *User
     pages map[string]string
     paths map[string]string
     formatsPages map[string]string
     jwtKey map[string][]byte
 
+    idGenerator IDGenerator
     Logger log.Logger
     tokensDB *redis.Client
 }
 
 func NewSession(c Config, confpages map[string]string, logger log.Logger) *Session{
     return &Session{
-        user: nil,
-        paths: c.Paths,
-        jwtKey: c.JwtKey,
-        formatsPages: c.FormatsPages,
         pages: confpages,
+        paths: c.Paths,
+        formatsPages: c.FormatsPages,
+        jwtKey: c.JwtKey,
+
+        idGenerator: IDGenerator{id: 0},
         Logger: logger,
     }
 }
 
 func (s *Session) setupDefaultHandlers(){
     pages := s.pages
-    http.HandleFunc(pages["auth"], s.authHandler)
     http.HandleFunc(pages["login"], s.loginHandler)
     http.HandleFunc(pages["registration"], s.registrationHandler)
     http.HandleFunc(pages["refresh"], s.refreshHandler)     
@@ -78,7 +78,7 @@ func (s *Session) Run(){
 
 func verifyUserPass(username, password string)(bool, error) {
 	
-	if hasUser, err := database.CheckUserInDB(username); err != nil || !hasUser{
+	if hasUser, err := database.CheckUsernameInDB(username); err != nil || !hasUser{
         return false, err
     }
 
@@ -129,9 +129,10 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
     if ok{
         ad, err := s.getAuthDetails(r)
         
-        user, err := s.getUser(ad.userID)
+        strUserID := strconv.FormatInt(ad.userID, 10)
+        username, err := database.GetUsername(strUserID)
         if err == nil{
-            url := "/" + user.username
+            url := "/" + username
             http.Redirect(w, r, url, http.StatusFound)
             return
         }
@@ -154,7 +155,6 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
             ok, err := verifyUserPass(username, password)
             if err != nil{
                 s.Logger.Error(err, "verify user password")
-                return
             }
             if !ok{
                    fmt.Fprintf(w, "Incorrect login or password")
@@ -162,21 +162,27 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
                 return
             }
 
-            user, err := s.setUser(username, password)
+            strUserID, err := database.GetUserID(username)
+            if err !=    nil{
+                s.Logger.Error(err, "get userID")
+                w.WriteHeader(http.StatusUnauthorized)
+                return   
+            }
+            userID, err := strconv.ParseInt(strUserID, 10, 64)
             if err != nil{
-                s.Logger.Error(err, "set user in db")
+                s.Logger.Error(err, "convertation strUserID to userID")
+                w.WriteHeader(http.StatusInternalServerError)
+                return   
+                
+            }
+
+            tokens,  err := newTokens(userID, s.jwtKey)
+            if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
             }
-            s.user = user
 
-            tokens,  err := newTokens(user.id, s.jwtKey)
-            if err != nil{
-                w.WriteHeader(http.StatusInternalServerError)
-                return
-            }
-
-            if err := s.newAuthorization(user.id, tokens); err != nil{
+            if err := s.newAuthorization(userID, tokens); err != nil{
                 w.WriteHeader(http.StatusForbidden)
                 s.Logger.Error(err, "create auth")
                 return
@@ -184,7 +190,9 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
 
             saveTokensInCookie(w, tokens)
 
-            http.Redirect(w, r, s.pages["auth"], http.StatusFound) 
+            formats := s.formatsPages
+            urlProfile := fmt.Sprintf(formats["profile"], username)
+            http.Redirect(w, r, urlProfile, http.StatusFound) 
     }
 }
 
@@ -209,10 +217,9 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request){
             username := r.FormValue("username")
             password := r.FormValue("password")
 
-            hasUser, err := database.CheckUserInDB(username)
+            hasUser, err := database.CheckUsernameInDB(username)
             if err != nil{
                 s.Logger.Error(err, "check user in db")
-                return
             }
             if hasUser{
                 fmt.Fprintf(w, "User already exist")                   
@@ -226,70 +233,36 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request){
                 return
             }
 
-            if err := database.InsertNewUser(username, hash); err != nil{
+            userID := s.idGenerator.newID()
+            strUserID := strconv.FormatInt(userID, 10)
+
+            if err := database.InsertNewUser(strUserID, username, hash); err != nil{
                 s.Logger.Error(err, "insert new user in db")
                 return
             }
 
-            user, err := s.setUser(username, password)
+            tokens,  err := newTokens(userID, s.jwtKey)
             if err != nil{
-                s.Logger.Error(err, "set user in db")
                 w.WriteHeader(http.StatusInternalServerError)
                 return
             }
-            s.user = user
 
-            tokens,  err := newTokens(user.id, s.jwtKey)
-            if err != nil{
-                w.WriteHeader(http.StatusInternalServerError)
+            if err := s.newAuthorization(userID, tokens); err != nil{
+                w.WriteHeader(http.StatusForbidden)
+                s.Logger.Error(err, "create auth")
                 return
             }
 
             saveTokensInCookie(w, tokens)
 
-            http.Redirect(w, r, s.pages["auth"], http.StatusFound)            
+            formats := s.formatsPages
+            urlProfile := fmt.Sprintf(formats["profile"], username)
+            urlDiary := fmt.Sprintf(formats["diary"], username)
+            http.HandleFunc(urlProfile, s.userHandler)
+            http.HandleFunc(urlDiary, s.diaryHandler)
+
+            http.Redirect(w, r, urlProfile, http.StatusFound)            
     }
-}
-
-func (s *Session) authHandler(w http.ResponseWriter, r *http.Request){
-
-    c, err := r.Cookie("access_token")
-    if err != nil {
-        if err == http.ErrNoCookie {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    accessToken := c.Value
-
-    token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
-        return s.jwtKey["access"], nil
-    })
-    if err != nil {
-        if err == jwt.ErrSignatureInvalid {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-
-    if !token.Valid {
-        w.WriteHeader(http.StatusUnauthorized)
-        return
-    }   
-
-    formats := s.formatsPages
-    urlProfile := fmt.Sprintf(formats["profile"], s.user.username)
-    
-    http.Redirect(w, r, urlProfile, http.StatusFound)
-
 }
 
 func (s *Session) refreshHandler(w http.ResponseWriter, r *http.Request){
@@ -331,13 +304,12 @@ func (s *Session) refreshHandler(w http.ResponseWriter, r *http.Request){
     }
 
     strUserID := fmt.Sprintf("%.f", claims["user_id"])
-    uUserID, convErr := strconv.ParseUint(strUserID, 10, 64)
+    userID, convErr := strconv.ParseInt(strUserID, 10, 64)
     if convErr != nil {
         w.WriteHeader(http.StatusUnprocessableEntity)
         s.Logger.Error(convErr, "convertation userID")
         return
     }
-    userID := int64(uUserID)
 
     deleted, delErr := s.deleteAuthorization(refreshUuid)
     if delErr != nil || deleted == 0 {

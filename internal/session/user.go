@@ -50,11 +50,10 @@ func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
         }
 
         strUserID := fmt.Sprintf("%.f", claims["user_id"])
-        UuserID, err := strconv.ParseUint(strUserID, 10, 64)
+        userID, err := strconv.ParseInt(strUserID, 10, 64)
         if err != nil {
             return nil, err
         }
-        userID := int64(UuserID)
         
         ad := &AuthDetails{
             accessUuid: accessUuid,
@@ -100,7 +99,7 @@ func (s *Session)verificationUserID(authD *AuthDetails)(bool, error){
     return true, nil
 }   
 
-func (s *Session)getUser(userID int64)(*User, error){
+/*func (s *Session)getUser(userID int64)(*User, error){
     user := &User{
         id: 1,
         username: "Ebumba",
@@ -119,7 +118,7 @@ func (s *Session)setUser(username, password string)(*User, error){
     } 
     return user, nil 
 }
-
+*/
 
 func (s *Session) userHandler(w http.ResponseWriter, r *http.Request){
 

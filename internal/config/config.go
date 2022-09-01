@@ -21,7 +21,6 @@ func NewConfig() Config{
 			"begin": 		"/",
 			"home": 		"/home",
 			"login": 		"/login",
-			"auth": 		"/auth",
 			"refresh": 		"/refresh",
 			"registration": "/registration",
 		},
@@ -53,7 +52,7 @@ func NewConfig() Config{
 			Keyfile: "../../internal/certificate/key.pem",
 		},
 		Database: database.Database{
-			Info: "host=localhost port=5432 user=postgres password=1234 dbname=abobus sslmode=disable",
+			Info: "host=localhost port=5432 user=Ebumba password=1234 dbname=abobus sslmode=disable",
 		},
 	}
 }
