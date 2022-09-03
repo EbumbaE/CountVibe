@@ -1,13 +1,2 @@
-Error: 2022/09/01 11:23:30 logger.go:31: sql: Rows are closed check user in db
-Error: 2022/09/01 11:24:35 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:24:42 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:27:17 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:29:02 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:37:04 logger.go:31: sql: Rows are closed check user in db
-Error: 2022/09/01 11:39:23 logger.go:31: sql: Rows are closed check user in db
-Error: 2022/09/01 11:40:42 logger.go:31: sql: Rows are closed check user in db
-Error: 2022/09/01 11:41:09 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:42:10 logger.go:31: sql: Rows are closed check user in db
-Error: 2022/09/01 11:43:48 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:46:39 logger.go:31: sql: no rows in result set verify user password
-Error: 2022/09/01 11:50:50 logger.go:31: pq: столбец "usernmae" не существует verify user password
+Error: 2022/09/03 11:34:31 logger.go:31: template: diary.html:10:14: executing "diary.html" at <.Date>: can't evaluate field Date in type session.ViewDiaryData new Template
+Error: 2022/09/03 11:34:41 logger.go:31: template: diary.html:10:14: executing "diary.html" at <.Date>: can't evaluate field Date in type session.ViewDiaryData new Template

@@ -23,6 +23,7 @@ func NewConfig() Config{
 			"login": 		"/login",
 			"refresh": 		"/refresh",
 			"registration": "/registration",
+			"diary": 		"/diary",
 		},
 		Server: server.Config{
 			Port: ":8080",
@@ -32,11 +33,13 @@ func NewConfig() Config{
 		},
 		Session: session.Config{
 			Paths: map[string]string{
-			    "static": 		"../../static/",
-		    	"login": 		"../../static/html/login.html",
-	    		"registration": "../../static/html/registration.html",
-			    "user": 		"../../static/html/user.html",
-			    "diary": 		"../../static/html/diary.html",
+			    "static": 		 "../../static/",
+		    	"login": 		 "../../static/html/login.html",
+	    		"registration":  "../../static/html/registration.html",
+			    "user":   		 "../../static/html/user.html",
+			    
+			    "diary": 		 "../../static/html/diary/diary.html",
+			    "item":  		 "../../static/html/diary/item.html",
 			},
 			FormatsPages: map[string]string{
 				"profile": "/%s",

@@ -5,6 +5,7 @@ import (
     "net/http"
     "strconv"
     "errors"
+    "html/template"
 
     "github.com/dgrijalva/jwt-go"
 )
@@ -18,7 +19,7 @@ type User struct{
     id int64 `yaml:"ID"`
     username string `yaml:"username"`
     password string `yaml:"password"`
-    isLogin bool `yaml:"islogin"`
+    isOnline bool `yaml:"isOnline"`
 }
 
 func deleteCookie(w http.ResponseWriter){
@@ -99,42 +100,34 @@ func (s *Session)verificationUserID(authD *AuthDetails)(bool, error){
     return true, nil
 }   
 
-/*func (s *Session)getUser(userID int64)(*User, error){
-    user := &User{
-        id: 1,
-        username: "Ebumba",
-        password: "",
-        isLogin: true,
-    } 
-    return user, nil 
-}
+func (s *Session)newTemplate(w http.ResponseWriter, data any, path string) error{
+    
+    ts, err := template.ParseFiles(path)
+    if err != nil {
+        return err
+    }
 
-func (s *Session)setUser(username, password string)(*User, error){
-    user := &User{
-        id: 1,
-        username: "Ebumba",
-        password: "",
-        isLogin: true,
-    } 
-    return user, nil 
+    err = ts.Execute(w, data)    
+    return err
 }
-*/
 
 func (s *Session) userHandler(w http.ResponseWriter, r *http.Request){
 
-    ok, err := LoginVerification(r, s.jwtKey)
+    isLogin, err := LoginVerification(r, s.jwtKey)
     if err != nil{
         s.Logger.Error(err, "Login verification")
-    }
-    if !ok{
-        http.Redirect(w, r, s.pages["login"], http.StatusFound)
-        return   
     }
 
     switch r.Method {
         case "GET":    
-            http.ServeFile(w, r, s.paths["user"])
-
+            data := ViewUserData{
+                IsLogin: isLogin,
+            }
+            path := s.paths["user"]
+            if err := s.newTemplate(w, data, path); err != nil{
+                s.Logger.Error(err, "new Template")
+                http.Error(w, "error in create Template", http.StatusInternalServerError)
+            }
         case "POST":
             err := r.ParseForm()
             if err != nil {
@@ -146,18 +139,31 @@ func (s *Session) userHandler(w http.ResponseWriter, r *http.Request){
                 url := r.URL.Path + s.pages["diary"]
                 http.Redirect(w, r, url, http.StatusFound)  
             }
-            if button == "exit"{
-                s.userLogout(w, r)
-                http.Redirect(w, r, "/", http.StatusFound)  
+            if isLogin{
+                if button == "exit"{
+                    s.userLogout(w, r)
+                    http.Redirect(w, r, "/", http.StatusFound)  
+                }
             }
-    }
+    }    
 }
 
 func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
-     switch r.Method {
-        case "GET":    
-            fmt.Println(s.paths["diary"])
-            http.ServeFile(w, r, s.paths["diary"])
+    
+    isLogin, err := LoginVerification(r, s.jwtKey)
+    if err != nil{
+        s.Logger.Error(err, "Login verification")
+    }
 
+    switch r.Method {
+        case "GET":
+            data := ViewDiaryData{
+                IsLogin: isLogin,
+            }
+            path := s.paths["diary"]
+            if err := s.newTemplate(w, data, path); err != nil{
+                s.Logger.Error(err, "new Template")
+                http.Error(w, "error in create Template", http.StatusInternalServerError)
+            }
     }
 }

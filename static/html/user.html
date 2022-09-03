@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8" />
-</head>
-<body>
-<div>
-  <form method="POST">     
-      <button name="button" value="diary">Diary</button>
-  </form>
-</div>
-<div>
-  <form method="POST">     
-      <button name="button" value="exit">Exit</button>
-  </form>
-</div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <div>
+      <form method="POST">     
+          <button name="button" value="diary">Diary</button>
+      </form>
+    </div>
+    
+    {{if .IsLogin}}
+      <div>
+        <form method="POST">     
+            <button name="button" value="exit">Exit</button>
+        </form>
+      </div>
+    {{end}}
+  </body>
 </html>

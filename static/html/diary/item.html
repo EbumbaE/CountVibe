@@ -1,0 +1,25 @@
+{{define "item"}}
+<tr>
+  <table class="item">
+    <tbody>
+      <td>
+        <div>
+          <form method="POST">     
+              <button name="button" value="delete:{{ .ID}}">x</button>
+          </form>
+        </div>
+        <div>
+          <a>{{ .nameItem}}</a>
+          <div>{{ .amountItem}}</div>
+        </div>
+      </td>
+
+      <td>{{ .fatItem}}</td>
+      <td>{{ .CarbsItem}}</td>
+      <td>{{ .protItem}}</td>
+      <td>{{ .calsItem}}</td>                
+
+    </tbody>
+  </table>
+</tr>
+{{end}}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  
+  <body>
+    <div class="infoHeader">
+      <h1>Food diary</h1>
+      <div>{{ .Date}}</div>
+    </div>
+
+    <div class="choiceDate">
+
+    </div>
+
+    <div class="totalSum">
+      <div>Total Sum:</div>
+      <table>
+        <tbody>
+          <tr>
+            <td>Fat</td>
+            <td>Carbs</td>
+            <td>Prot</td>
+            <td>Cals</td>
+          </tr>
+          <tr style="height:2px"><td></td></tr>
+          <tr>
+            <td>{{ .TotalFats}}</td>
+            <td>{{ .TotalCarbs}}</td>
+            <td>{{ .TotalProt}}</td>
+            <td>{{ .TotalCals}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <table class="breakfastTable">
+      <tbody>
+      
+        <tr>
+          <table class="breakfastTotalInfo">
+            <tbody>
+              <tr>
+                <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Breakfast</td>
+                <td>{{ .TotalBreakfastFat}}</td>
+                <td>{{ .TotalBreakfastCarb}}</td>
+                <td>{{ .TotalBreakfastProtein}}</td>
+                <td>{{ .TotalBreakfastCalories}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </tr>
+        
+        <tr>
+          <td style="height:7px"></td>
+        </tr>
+
+        {{range .breakfastItems}}
+          {{block "item" .}}{{end}}
+        {{end}}
+        
+        <tr>
+          {{if .IsLogin}}
+            <div>
+              <form method="POST">     
+                  <button name="button" value="addToBreakfast">Add Item</button>
+              </form>
+            </div>
+          {{end}}
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="lunchTable">
+      <tbody>
+      
+        <tr>
+          <table class="lunchTotalInfo">
+            <tbody>
+              <tr>
+                <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Lunch</td>
+                <td>{{ .TotalLunchFat}}</td>
+                <td>{{ .TotalLunchCarb}}</td>
+                <td>{{ .TotalLunchProtein}}</td>
+                <td>{{ .TotalLunchCalories}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </tr>
+        
+        <tr>
+          <td style="height:7px"></td>
+        </tr>
+
+        {{range .lunchItems}}
+          {{block "item" .}}{{end}}
+        {{end}}
+
+        <tr>
+          {{if .IsLogin}}
+            <div>
+              <form method="POST">     
+                  <button name="button" value="addToLunch">Add Item</button>
+              </form>
+            </div>
+          {{end}}
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="dinnerTable">
+      <tbody>
+      
+        <tr>
+          <table class="dinnerTotalInfo">
+            <tbody>
+              <tr>
+                <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Dinner</td>
+                <td>{{ .TotalDinnerFat}}</td>
+                <td>{{ .TotalDinnerCarb}}</td>
+                <td>{{ .TotalDinnerProtein}}</td>
+                <td>{{ .TotalDinnerCalories}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </tr>
+        
+        <tr>
+          <td style="height:7px"></td>
+        </tr>
+          {{range .dinnerItems}}
+            {{block "item" .}}{{end}}
+          {{end}}
+
+        <tr>
+          {{if .IsLogin}}
+            <div>
+              <form method="POST">     
+                  <button name="button" value="addToDinnerfast">Add Item</button>
+              </form>
+            </div>
+          {{end}}
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="snacksTable">
+      <tbody>
+      
+        <tr>
+          <table class="snacksTotalInfo">
+            <tbody>
+              <tr>
+                <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Snacks</td>
+                <td>{{ .TotalSnacksFat}}</td>
+                <td>{{ .TotalSnacksCarb}}</td>
+                <td>{{ .TotalSnacksProtein}}</td>
+                <td>{{ .TotalSnacksCalories}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </tr>
+        
+        <tr>
+          <td style="height:7px"></td>
+        </tr>
+
+        {{range .snacksItems}}
+          {{block "item" .}}{{end}}
+        {{end}}
+      
+        <tr>
+          {{if .IsLogin}}
+            <div>
+              <form method="POST">     
+                  <button name="button" value="addToSnacks">Add Item</button>
+              </form>
+            </div>
+          {{end}}
+        </tr>
+      </tbody>
+    </table>
+
+  </body>
+</html>
