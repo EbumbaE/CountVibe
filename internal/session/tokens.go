@@ -164,8 +164,8 @@ func saveTokensInCookie(w http.ResponseWriter, t *Tokens){
     })
 }
 
-func GetjwtToken(r *http.Request, jwtKey map[string][]byte)(*jwt.Token, error){
-    c, err := r.Cookie("access_token")
+func GetjwtToken(r *http.Request, jwtKey []byte, tokenType string)(*jwt.Token, error){
+    c, err := r.Cookie(tokenType)
     if err != nil {
         return nil, err
     }
@@ -176,11 +176,41 @@ func GetjwtToken(r *http.Request, jwtKey map[string][]byte)(*jwt.Token, error){
         if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
             return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
         }
-        return jwtKey["access"], nil
+        return jwtKey, nil
     })
     if err != nil {
         return nil, err
     }
     return token, nil
 
+}
+
+func (s *Session)confirmToken(token *jwt.Token, uuidType string)(bool, error){
+
+    claims, ok := token.Claims.(jwt.MapClaims)
+    if !ok || !token.Valid{
+        return false, nil
+    }
+    strTokenUserID := fmt.Sprintf("%.f", claims["user_id"])
+    tokenUserID, err := strconv.ParseInt(strTokenUserID, 10, 64)
+    if err != nil{
+        return false, err
+    }
+
+    tokenUuid := claims[uuidType].(string)
+
+    strUserID, err := s.tokensDB.Get(tokenUuid).Result()
+    if err != nil {
+        return false, err
+    }
+    dbUserID, err := strconv.ParseInt(strUserID, 10, 64)
+    if err != nil{
+        return false, err
+    }
+
+    if tokenUserID != dbUserID{
+        return false, nil
+    }
+
+    return true, nil
 }

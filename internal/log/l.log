@@ -1,2 +1,0 @@
-Error: 2022/09/03 11:34:31 logger.go:31: template: diary.html:10:14: executing "diary.html" at <.Date>: can't evaluate field Date in type session.ViewDiaryData new Template
-Error: 2022/09/03 11:34:41 logger.go:31: template: diary.html:10:14: executing "diary.html" at <.Date>: can't evaluate field Date in type session.ViewDiaryData new Template

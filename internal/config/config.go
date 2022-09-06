@@ -42,8 +42,8 @@ func NewConfig() Config{
 			    "item":  		 "../../static/html/diary/item.html",
 			},
 			FormatsPages: map[string]string{
-				"profile": "/%s",
-				"diary": "/%s/diary", 
+				"profile": "/%s/",
+				"diary":   "/%s/diary", 
 			},
 			JwtKey: map[string][]byte{
 				"access": []byte("birimborom"),

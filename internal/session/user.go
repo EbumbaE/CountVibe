@@ -5,9 +5,11 @@ import (
     "net/http"
     "strconv"
     "errors"
+    "regexp"
     "html/template"
 
     "github.com/dgrijalva/jwt-go"
+    "CountVibe/internal/database"
 )
 
 type AuthDetails struct{
@@ -37,7 +39,7 @@ func deleteCookie(w http.ResponseWriter){
 }
 
 func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
-    token, err := GetjwtToken(r, s.jwtKey) 
+    token, err := GetjwtToken(r, s.jwtKey["access"], "access_token") 
     if err != nil {
         return nil, err
     }
@@ -111,9 +113,44 @@ func (s *Session)newTemplate(w http.ResponseWriter, data any, path string) error
     return err
 }
 
-func (s *Session) userHandler(w http.ResponseWriter, r *http.Request){
+func (s *Session)compareLogin(r *http.Request)(bool, error){
 
-    isLogin, err := LoginVerification(r, s.jwtKey)
+    url := r.URL.Path
+
+    pattern := `/[a-zA-Z0-9]+/`
+    re, _ := regexp.Compile(pattern)
+    res := re.FindAllString(url, -1)
+    lenUsername := len(res[0])
+    username := res[0][1:lenUsername - 1]
+
+    strPathUserID, err := database.GetUserID(username)
+    if err != nil{
+        return false, err
+    }  
+    pathUserID, err := strconv.ParseInt(strPathUserID, 10, 64)
+
+    token, err := GetjwtToken(r, s.jwtKey["access"], "access_token")
+    if err != nil{
+        return false, err
+    }
+
+    claims, _ := token.Claims.(jwt.MapClaims)
+    strUserID := fmt.Sprintf("%.f", claims["user_id"])
+    userID, convErr := strconv.ParseInt(strUserID, 10, 64)
+    if convErr != nil {
+        return false, convErr
+    }
+
+    if userID == pathUserID{
+        return true, nil
+    }
+    return false, nil
+
+}
+
+func (s *Session)userHandler(w http.ResponseWriter, r *http.Request){
+
+    isLogin, err := s.compareLogin(r)
     if err != nil{
         s.Logger.Error(err, "Login verification")
     }
@@ -150,7 +187,7 @@ func (s *Session) userHandler(w http.ResponseWriter, r *http.Request){
 
 func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
     
-    isLogin, err := LoginVerification(r, s.jwtKey)
+    isLogin, err := s.compareLogin(r)
     if err != nil{
         s.Logger.Error(err, "Login verification")
     }

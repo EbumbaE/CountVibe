@@ -56,7 +56,7 @@ func (s *Session) restoreUserHandlers(){
     for _, username := range usernames{
         urlProfile := fmt.Sprintf(formats["profile"], username)
         urlDiary := fmt.Sprintf(formats["diary"], username)
-
+        
         http.HandleFunc(urlProfile, s.userHandler)
         http.HandleFunc(urlDiary, s.diaryHandler)
     }
@@ -94,35 +94,21 @@ func verifyUserPass(username, password string)(bool, error) {
   	return false, nil
 }
 
-func LoginVerification(r *http.Request, jwtKey map[string][]byte) (bool, error){
-    c, err := r.Cookie("access_token")
-    if err != nil {
-        return false, nil
-    }
+func (s *Session) loginVerification(r *http.Request, jwtKey map[string][]byte) (bool, error){
 
-    accessToken := c.Value
-
-    token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
-        return jwtKey["access"], nil
-    })
+    token, err := GetjwtToken(r, jwtKey["access"], "access_token")
     if err != nil{
         return false, err
     }
 
-    _, ok := token.Claims.(jwt.Claims)
-    if !ok || !token.Valid{
-        return false, nil
-    }
-    
-    return true, nil
+    ok, err := s.confirmToken(token, "access_uuid")
+
+    return ok, err
 }
 
 func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
 
-    ok, err := LoginVerification(r, s.jwtKey)
+    ok, err := s.loginVerification(r, s.jwtKey)
     if err != nil{
         s.Logger.Error(err, "Login verification")
     }
@@ -267,28 +253,18 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request){
 
 func (s *Session) refreshHandler(w http.ResponseWriter, r *http.Request){
 
-    c, err := r.Cookie("refresh_token")
-    if err != nil {
-        if err == http.ErrNoCookie {
-            w.WriteHeader(http.StatusUnauthorized)
-            return
-        }
-        w.WriteHeader(http.StatusBadRequest)
-        return
+    token, err := GetjwtToken(r, s.jwtKey["refresh"], "refresh_token")
+    if err != nil{
+        s.Logger.Error(err, "get jwt token")
     }
 
-    refreshToken := c.Value
-
-    token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error){
-        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok{
-            return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-        }
-        return s.jwtKey["refresh"], nil
-    })
-    if err != nil{
-        s.Logger.Error(err, "Parse token")
+    ok, err := s.confirmToken(token, "refresh_uuid")
+    if !ok{
         w.WriteHeader(http.StatusUnauthorized)
         return
+    }
+    if err != nil{
+        s.Logger.Error(err, "Confirm token while refresh")
     }
 
     claims, ok := token.Claims.(jwt.MapClaims)

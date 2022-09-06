@@ -30,8 +30,8 @@ func main() {
 		logger.Error("Setup certificate ", err)
 	}
 
-	au := session.NewSession(conf.Session, conf.Pages, logger)
-	au.Run()
+	s := session.NewSession(conf.Session, conf.Pages, logger)
+	s.Run()
 
 	serv := server.NewServer(conf.Server, conf.Pages, logger)
 	serv.Run(conf.Certificate.Certfile, conf.Certificate.Keyfile)
