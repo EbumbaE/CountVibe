@@ -120,8 +120,9 @@ func (s *Session)compareLogin(r *http.Request)(bool, error){
     pattern := `/[a-zA-Z0-9]+/`
     re, _ := regexp.Compile(pattern)
     res := re.FindAllString(url, -1)
-    lenUsername := len(res[0])
-    username := res[0][1:lenUsername - 1]
+    firstRes := res[0]
+    lenUsername := len(firstRes)
+    username := firstRes[1:lenUsername - 1]
 
     strPathUserID, err := database.GetUserID(username)
     if err != nil{
@@ -194,13 +195,50 @@ func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
 
     switch r.Method {
         case "GET":
+
+            m := Meal{
+                TotalFats: 0,
+                TotalCarbs: 0,
+                TotalProts: 0,
+                TotalCals: 0,
+                Items: []Item{
+                    Item{
+                        ID: 1,
+                        Name: "kuraga",
+                        Amount: 100,
+                        Fat: 1,
+                        Carbs: 40,
+                        Prot: 12,
+                        Cals: 365,
+                    },
+                },
+            }
             data := ViewDiaryData{
                 IsLogin: isLogin,
+                Date: "06.09.2022",
+                TotalFats: 0,
+                TotalCarbs: 0,
+                TotalProts: 0,
+                TotalCals: 0,
+                
+                Breakfast: m,
+                Lunch: m,
+                Dinner: m,
+                Snacks: m,
             }
-            path := s.paths["diary"]
-            if err := s.newTemplate(w, data, path); err != nil{
-                s.Logger.Error(err, "new Template")
-                http.Error(w, "error in create Template", http.StatusInternalServerError)
+            paths := []string{
+                s.paths["diary"],
+                s.paths["item"],   
+            }
+            ts, err := template.ParseFiles(paths...)
+            if err != nil {
+                s.Logger.Error(err, "template parse files")     
+                return
+            }
+         
+            err = ts.Execute(w, data)
+            if err != nil {
+                s.Logger.Error(err, "template execute")
             }
     }
 }

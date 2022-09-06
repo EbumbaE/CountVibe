@@ -162,7 +162,7 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
                 
             }
 
-            tokens,  err := newTokens(userID, s.jwtKey)
+            tokens, err := newTokens(userID, s.jwtKey)
             if err != nil{
                 w.WriteHeader(http.StatusInternalServerError)
                 return
