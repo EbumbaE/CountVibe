@@ -39,7 +39,7 @@ func NewConfig() Config{
 			    "user":   		 "../../static/html/user.html",
 			    
 			    "diary": 		 "../../static/html/diary/diary.html",
-			    "item":  		 "../../static/html/diary/item.html",
+			    "item":  		 "../../static/html/diary/portion.html",
 			},
 			FormatsPages: map[string]string{
 				"profile": "/%s/",
@@ -51,8 +51,8 @@ func NewConfig() Config{
 			},
 		},
 		Certificate: certificate.Config{
-			Certfile: "../../internal/certificate/cert.pem",
-			Keyfile: "../../internal/certificate/key.pem",
+			CertPath: "../../internal/certificate/cert.pem",
+			KeyPath: "../../internal/certificate/key.pem",
 		},
 		Database: database.Database{
 			Info: "host=localhost port=5432 user=Ebumba password=1234 dbname=abobus sslmode=disable",

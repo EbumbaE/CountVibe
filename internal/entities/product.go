@@ -1,37 +1,37 @@
 package entities
 
 type Composition struct{
-	calories float64
-	protein float64
-	fat float64
-	carbohydrate float64
+	Calories float64
+	Proteins float64
+	Fats float64
+	Carbohydrates float64
 }
 
 type Product struct{
-	name string
-	id int
-	unitcomposition Composition
-	unit string
-	amountunit float64
+	ID int
+	Name string
+	UnitComposition Composition
+	Unit string
+	AmountUnit float64
 }
 
 func (c Composition) multCompositionOn(delta float64){
-	c.calories *= delta
-	c.protein *= delta
-	c.fat *= delta
-	c.carbohydrate *= delta
+	c.Calories *= delta
+	c.Proteins *= delta
+	c.Fats *= delta
+	c.Carbohydrates *= delta
 }
 
 func (c Composition) divCompositionOn(delta float64){
-	c.calories /= delta
-	c.protein /= delta
-	c.fat /= delta
-	c.carbohydrate /= delta
+	c.Calories /= delta
+	c.Proteins /= delta
+	c.Fats /= delta
+	c.Carbohydrates /= delta
 }
 
 func (c Composition) addComposition(composition Composition){
-	c.calories += composition.calories
-	c.protein += composition.protein
-	c.fat += composition.fat
-	c.carbohydrate += composition.carbohydrate
+	c.Calories += composition.Calories
+	c.Proteins += composition.Proteins
+	c.Fats += composition.Fats
+	c.Carbohydrates += composition.Carbohydrates
 }

@@ -10,6 +10,7 @@ import (
 
     "github.com/dgrijalva/jwt-go"
     "CountVibe/internal/database"
+    "CountVibe/internal/entities"
 )
 
 type AuthDetails struct{
@@ -195,37 +196,8 @@ func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
 
     switch r.Method {
         case "GET":
+            data := entities.GetViewDiaryData("06.05.2020", isLogin)
 
-            m := Meal{
-                TotalFats: 0,
-                TotalCarbs: 0,
-                TotalProts: 0,
-                TotalCals: 0,
-                Items: []Item{
-                    Item{
-                        ID: 1,
-                        Name: "kuraga",
-                        Amount: 100,
-                        Fat: 1,
-                        Carbs: 40,
-                        Prot: 12,
-                        Cals: 365,
-                    },
-                },
-            }
-            data := ViewDiaryData{
-                IsLogin: isLogin,
-                Date: "06.09.2022",
-                TotalFats: 0,
-                TotalCarbs: 0,
-                TotalProts: 0,
-                TotalCals: 0,
-                
-                Breakfast: m,
-                Lunch: m,
-                Dinner: m,
-                Snacks: m,
-            }
             paths := []string{
                 s.paths["diary"],
                 s.paths["item"],   

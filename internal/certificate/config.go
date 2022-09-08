@@ -1,6 +1,6 @@
 package certificate
 
 type Config struct{
-	Certfile string `yaml:"certfile"`
-	Keyfile string `yaml:"keyfile"`
+	CertPath string `yaml:"certpath"`
+	KeyPath string `yaml:"keypath"`
 }

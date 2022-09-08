@@ -1,59 +1,59 @@
 package entities
 
 type Portion struct{
-	product Product
-	amount float64
-	calcportion Composition
+	Product Product
+	Amount float64
+	CalcPortion Composition
 }
 
 type Meal struct{
-	portions []Portion
-	countOrder int
-	calcmeal Composition
+	Portions []Portion
+	CountOrder int
+	CalcMeal Composition
 }
 
 type DayMeals struct {
-	meals []Meal
-	date string
-	calcdaymeals Composition
+	Meals []Meal
+	Date string
+	CalcDayMeals Composition
 }
 
 func divProductOnAmountUnit(product Product) Composition{
 
-    amountunit := product.amountunit
-    composition := product.unitcomposition
+    amountUnit := product.AmountUnit
+    composition := product.UnitComposition
 	
-	composition.divCompositionOn(amountunit)
+	composition.divCompositionOn(amountUnit)
 	return composition
 }
 
 func (p Portion)сalcPorcion(){
 	
-	product := p.product
-	calcportion := divProductOnAmountUnit(product)
+	product := p.Product
+	calcPortion := divProductOnAmountUnit(product)
 
-	amount := p.amount
-	calcportion.multCompositionOn(amount)
+	amount := p.Amount
+	calcPortion.multCompositionOn(amount)
 
-	p.calcportion = calcportion
+	p.CalcPortion = calcPortion
 }
 
 func (m Meal)сalcMeal(){
 
-	calcmeal := Composition{0,0,0,0}
-	for _, portion := range m.portions{
-		c := portion.calcportion
-		calcmeal.addComposition(c)
+	calcMeal := Composition{0,0,0,0}
+	for _, portion := range m.Portions{
+		c := portion.CalcPortion
+		calcMeal.addComposition(c)
 	}
-	m.calcmeal = calcmeal
+	m.CalcMeal = calcMeal
 }
 
 func (m DayMeals)сalcDayMeal(){
 			
-	calcdaymeals := Composition{0,0,0,0}
-	for _, meel := range m.meals{
-		c := meel.calcmeal
-		calcdaymeals.addComposition(c)
+	calcDayMeals := Composition{0,0,0,0}
+	for _, meel := range m.Meals{
+		c := meel.CalcMeal
+		calcDayMeals.addComposition(c)
 	}
-	m.calcdaymeals = calcdaymeals
+	m.CalcDayMeals = calcDayMeals
 }

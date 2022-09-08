@@ -16,20 +16,20 @@
 
     <div class="totalSum">
       <div>Total Sum:</div>
-      <table>
+      <table width="20%" cellpadding="5">
         <tbody>
           <tr>
-            <td>Fat</td>
+            <td>Fats</td>
             <td>Carbs</td>
-            <td>Prot</td>
+            <td>Prots</td>
             <td>Cals</td>
           </tr>
           <tr style="height:2px"><td></td></tr>
           <tr>
-            <td>{{ .TotalFats}}</td>
-            <td>{{ .TotalCarbs}}</td>
-            <td>{{ .TotalProts}}</td>
-            <td>{{ .TotalCals}}</td>
+            <td>{{ .Total.Fats}}</td>
+            <td>{{ .Total.Carbohydrates}}</td>
+            <td>{{ .Total.Proteins}}</td>
+            <td>{{ .Total.Calories}}</td>
           </tr>
         </tbody>
       </table>
@@ -43,10 +43,10 @@
             <tbody>
               <tr>
                 <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Breakfast</td>
-                <td>{{ .Breakfast.TotalFats}}</td>
-                <td>{{ .Breakfast.TotalCarbs}}</td>
-                <td>{{ .Breakfast.TotalProts}}</td>
-                <td>{{ .Breakfast.TotalCals}}</td>
+                <td>{{ .Breakfast.CalcMeal.Fats}}</td>
+                <td>{{ .Breakfast.CalcMeal.Carbohydrates}}</td>
+                <td>{{ .Breakfast.CalcMeal.Proteins}}</td>
+                <td>{{ .Breakfast.CalcMeal.Calories}}</td>
               </tr>
             </tbody>
           </table>
@@ -55,9 +55,9 @@
         <tr>
           <td style="height:7px"></td>
         </tr>
-
-        {{range .Breakfast.Items}}
-          {{block "item" .}}{{end}}
+        
+        {{range .Breakfast.Portions}}
+          {{block "portion" .}}{{end}}
         {{end}}
         
         <tr>
@@ -80,10 +80,10 @@
             <tbody>
               <tr>
                 <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Lunch</td>
-                <td>{{ .Lunch.TotalFats}}</td>
-                <td>{{ .Lunch.TotalCarbs}}</td>
-                <td>{{ .Lunch.TotalProts}}</td>
-                <td>{{ .Lunch.TotalCals}}</td>
+                <td>{{ .Lunch.CalcMeal.Fats}}</td>
+                <td>{{ .Lunch.CalcMeal.Carbohydrates}}</td>
+                <td>{{ .Lunch.CalcMeal.Proteins}}</td>
+                <td>{{ .Lunch.CalcMeal.Calories}}</td>
               </tr>
             </tbody>
           </table>
@@ -93,8 +93,8 @@
           <td style="height:7px"></td>
         </tr>
 
-        {{range .Lunch.Items}}
-          {{block "item" .}}{{end}}
+        {{range .Lunch.Portions}}
+          {{block "portion" .}}{{end}}
         {{end}}
 
         <tr>
@@ -117,10 +117,10 @@
             <tbody>
               <tr>
                 <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Dinner</td>
-                <td>{{ .Dinner.TotalFats}}</td>
-                <td>{{ .Dinner.TotalCarbs}}</td>
-                <td>{{ .Dinner.TotalProts}}</td>
-                <td>{{ .Dinner.TotalCals}}</td>
+                <td>{{ .Dinner.CalcMeal.Fats}}</td>
+                <td>{{ .Dinner.CalcMeal.Carbohydrates}}</td>
+                <td>{{ .Dinner.CalcMeal.Proteins}}</td>
+                <td>{{ .Dinner.CalcMeal.Calories}}</td>
               </tr>
             </tbody>
           </table>
@@ -129,8 +129,8 @@
         <tr>
           <td style="height:7px"></td>
         </tr>
-          {{range .Dinner.Items}}
-            {{block "item" .}}{{end}}
+          {{range .Dinner.Portions}}
+            {{block "portion" .}}{{end}}
           {{end}}
 
         <tr>
@@ -153,10 +153,10 @@
             <tbody>
               <tr>
                 <td width="*" style="font-weight:bold;font-size:16px;padding-left:2px">Snacks</td>
-                <td>{{ .Snacks.TotalFats}}</td>
-                <td>{{ .Snacks.TotalCarbs}}</td>
-                <td>{{ .Snacks.TotalProts}}</td>
-                <td>{{ .Snacks.TotalCals}}</td>
+                <td>{{ .Snacks.CalcMeal.Fats}}</td>
+                <td>{{ .Snacks.CalcMeal.Carbohydrates}}</td>
+                <td>{{ .Snacks.CalcMeal.Proteins}}</td>
+                <td>{{ .Snacks.CalcMeal.Calories}}</td>
               </tr>
             </tbody>
           </table>
@@ -166,8 +166,8 @@
           <td style="height:7px"></td>
         </tr>
 
-        {{range .Snacks.Items}}
-          {{block "item" .}}{{end}}
+        {{range .Snacks.Portions}}
+          {{block "portion" .}}{{end}}
         {{end}}
       
         <tr>

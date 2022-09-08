@@ -1,43 +1,72 @@
-Error: 2022/09/06 21:18:25 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:18:25 logger.go:31: template: diary.html:10:14: executing "diary.html" at <.Date>: can't evaluate field Date in type *session.TemplateDiaryData template execute
-Error: 2022/09/06 21:19:45 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:19:45 logger.go:31: template: diary.html:29:19: executing "diary.html" at <.TotalFats>: can't evaluate field TotalFats in type *session.TemplateDiaryData template execute
-Error: 2022/09/06 21:20:08 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:20:08 logger.go:31: template: diary.html:46:29: executing "diary.html" at <.Diary.Breakfast.TotalFat>: can't evaluate field TotalFat in type session.Meal template execute
-Error: 2022/09/06 21:20:09 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:20:09 logger.go:31: template: diary.html:46:29: executing "diary.html" at <.Diary.Breakfast.TotalFat>: can't evaluate field TotalFat in type session.Meal template execute
-Error: 2022/09/06 21:20:57 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:20:57 logger.go:31: template: diary.html:46:33: executing "diary.html" at <.Breakfast.TotalFat>: can't evaluate field TotalFat in type session.Meal template execute
-Error: 2022/09/06 21:20:57 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:20:57 logger.go:31: template: diary.html:46:33: executing "diary.html" at <.Breakfast.TotalFat>: can't evaluate field TotalFat in type session.Meal template execute
-Error: 2022/09/06 21:21:31 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:21:31 logger.go:31: template: diary.html:47:33: executing "diary.html" at <.Breakfast.TotalCarb>: can't evaluate field TotalCarb in type session.Meal template execute
-Error: 2022/09/06 21:21:31 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:21:31 logger.go:31: template: diary.html:47:33: executing "diary.html" at <.Breakfast.TotalCarb>: can't evaluate field TotalCarb in type session.Meal template execute
-Error: 2022/09/06 21:22:47 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:22:47 logger.go:31: template: diary.html:31:19: executing "diary.html" at <.TotalProts>: can't evaluate field TotalProts in type session.ViewDiaryData template execute
-Error: 2022/09/06 21:22:47 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:22:47 logger.go:31: template: diary.html:31:19: executing "diary.html" at <.TotalProts>: can't evaluate field TotalProts in type session.ViewDiaryData template execute
-Error: 2022/09/06 21:23:41 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:23:41 logger.go:31: template: diary.html:59:26: executing "diary.html" at <.Breakfast.Items>: range can't iterate over 0 template execute
-Error: 2022/09/06 21:25:17 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:25:17 logger.go:31: template: diary.html:59:26: executing "diary.html" at <.Breakfast.Items>: range can't iterate over 0 template execute
-Error: 2022/09/06 21:25:18 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:25:18 logger.go:31: template: diary.html:59:26: executing "diary.html" at <.Breakfast.Items>: range can't iterate over 0 template execute
-Error: 2022/09/06 21:25:18 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:25:18 logger.go:31: template: diary.html:59:26: executing "diary.html" at <.Breakfast.Items>: range can't iterate over 0 template execute
-Error: 2022/09/06 21:33:42 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:33:42 logger.go:31: template: item.html:8:53: executing "item" at <.ID>: can't evaluate field ID in type session.Item template execute
-Error: 2022/09/06 21:33:42 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:33:42 logger.go:31: template: item.html:8:53: executing "item" at <.ID>: can't evaluate field ID in type session.Item template execute
-Error: 2022/09/06 21:33:43 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:33:43 logger.go:31: template: item.html:8:53: executing "item" at <.ID>: can't evaluate field ID in type session.Item template execute
-Error: 2022/09/06 21:34:27 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:34:27 logger.go:31: template: item.html:12:21: executing "item" at <.Item.Name>: can't evaluate field Item in type session.Item template execute
-Error: 2022/09/06 21:37:59 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:37:59 logger.go:31: template: diary.html:84:29: executing "diary.html" at <.Lunch.TotalLunchCarb>: can't evaluate field TotalLunchCarb in type session.Meal template execute
-Error: 2022/09/06 21:38:37 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:38:37 logger.go:31: template: diary.html:84:29: executing "diary.html" at <.Lunch.TotalCarb>: can't evaluate field TotalCarb in type session.Meal template execute
-Error: 2022/09/06 21:38:57 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:39:28 logger.go:31: http: named cookie not present Login verification
-Error: 2022/09/06 21:39:31 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/07 21:12:59 logger.go:31: check health TokensDB
+Error: 2022/09/07 21:14:45 logger.go:31: check health TokensDB
+Error: 2022/09/07 21:14:45 logger.go:31: tls: failed to find certificate PEM data in certificate input, but did find a private key; PEM inputs may have been switched
+Error: 2022/09/07 21:15:35 logger.go:31: check health TokensDB
+Error: 2022/09/07 21:36:44 logger.go:31: check health TokensDB
+Error: 2022/09/08 08:23:45 logger.go:31: check health TokensDB
+Error: 2022/09/08 08:24:57 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:25:04 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:25:08 logger.go:31: template: diary.html:46:33: executing "diary.html" at <.Breakfast.CalcPortion.Fat>: can't evaluate field CalcPortion in type entities.Meal template execute
+Error: 2022/09/08 08:26:46 logger.go:31: template: diary.html:48:33: executing "diary.html" at <.Breakfast.CalcMeal.Proteine>: can't evaluate field Proteine in type entities.Composition template execute
+Error: 2022/09/08 08:26:53 logger.go:31: template: diary.html:48:33: executing "diary.html" at <.Breakfast.CalcMeal.Proteine>: can't evaluate field Proteine in type entities.Composition template execute
+Error: 2022/09/08 08:27:27 logger.go:31: template: diary.html:83:29: executing "diary.html" at <.Lunch.CalcPortion.Fats>: can't evaluate field CalcPortion in type entities.Meal template execute
+Error: 2022/09/08 08:28:25 logger.go:31: template: diary.html:83:29: executing "diary.html" at <.Lunch.CalcMeal.Fats>: can't evaluate field Fats in type entities.Composition template execute
+Error: 2022/09/08 08:28:26 logger.go:31: template: diary.html:83:29: executing "diary.html" at <.Lunch.CalcMeal.Fats>: can't evaluate field Fats in type entities.Composition template execute
+Error: 2022/09/08 08:28:27 logger.go:31: template: diary.html:83:29: executing "diary.html" at <.Lunch.CalcMeal.Fats>: can't evaluate field Fats in type entities.Composition template execute
+Error: 2022/09/08 08:31:33 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:31:33 logger.go:31: template: diary.html:29:25: executing "diary.html" at <.Total.Fat>: can't evaluate field Fat in type entities.Composition template execute
+Error: 2022/09/08 08:31:46 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:31:46 logger.go:31: template: portion.html:17:25: executing "portion" at <.CalcPortion.Fat>: can't evaluate field Fat in type entities.Composition template execute
+Error: 2022/09/08 08:32:06 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:32:20 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:32:24 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:32:28 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:37:58 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:38:10 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:38:19 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:38:30 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:38:37 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:38:42 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:39:02 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:39:02 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:01 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:01 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:04 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:08 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:20 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:26 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:34 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:35 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:41:55 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:42:26 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:42:27 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:42:27 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:42:33 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:42:33 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:44:33 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:44:34 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:45:21 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:47:08 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:47:11 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:49:43 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:49:43 logger.go:31: template: diary.html:61:17: executing "diary.html" at <.IsLogin>: can't evaluate field IsLogin in type entities.Portion template execute
+Error: 2022/09/08 08:49:43 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:49:43 logger.go:31: template: diary.html:61:17: executing "diary.html" at <.IsLogin>: can't evaluate field IsLogin in type entities.Portion template execute
+Error: 2022/09/08 08:50:56 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:50:56 logger.go:31: template: diary.html:61:17: executing "diary.html" at <.IsLogin>: can't evaluate field IsLogin in type entities.Portion template execute
+Error: 2022/09/08 08:53:27 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:53:27 logger.go:31: template: portion.html:8:53: executing "portion" at <.ID>: can't evaluate field ID in type entities.Portion template execute
+Error: 2022/09/08 08:53:28 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:53:28 logger.go:31: template: portion.html:8:53: executing "portion" at <.ID>: can't evaluate field ID in type entities.Portion template execute
+Error: 2022/09/08 08:53:40 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:53:55 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:53:56 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:53:58 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:54:28 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:54:43 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:54:44 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 08:54:45 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 09:00:46 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 09:00:50 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 09:00:59 logger.go:31: http: named cookie not present Login verification
+Error: 2022/09/08 09:07:42 logger.go:31: http: named cookie not present Login verification

@@ -34,6 +34,6 @@ func main() {
 	s.Run()
 
 	serv := server.NewServer(conf.Server, conf.Pages, logger)
-	serv.Run(conf.Certificate.Certfile, conf.Certificate.Keyfile)
+	serv.Run(conf.Certificate.CertPath, conf.Certificate.KeyPath)
 
 }
