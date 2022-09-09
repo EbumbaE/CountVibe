@@ -1,6 +1,6 @@
 @font-face {
   font-family: Raleway;
-  src: url("../fonts/Raleway/Raleway-Medium.ttf") format("ttf");
+  src: url("../../static/fonts/Raleway/Raleway-Medium.ttf") format("ttf");
 }
 body {
   margin: 0;
