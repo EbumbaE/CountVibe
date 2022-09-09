@@ -1,0 +1,69 @@
+.breakfastTable{
+    width: 60%;
+    margin: auto;
+
+    &-info{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        height: 5vh;
+
+        >div{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            justify-items: center;
+        }
+    }
+
+
+    &-item{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+
+        background-color: $color-white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 5px 20px 1px rgba(31, 31, 49, 0.1);
+
+        &-form{
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+            align-items: center;
+
+            button{
+                background-color: $color-but2   ;
+                border: none;
+                border-radius: 5px;
+                color: $color-white;
+            }
+        }
+
+        &-results{
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            align-items: center;
+            justify-items: center;
+        }
+    }
+
+
+    &-button{
+        display: grid;
+        justify-content: end;
+        height: 5vh;
+        margin-top: 1vh;
+
+        button{
+            background-color: transparent;
+            border: solid 2px $color-but;
+            height: 30px;
+            width: 80px;
+
+            &:hover{
+                background-color: $color-but;
+                color: $color-white;
+                transition: .3s;
+            }
+        }
+    }
+}
