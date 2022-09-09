@@ -8,12 +8,15 @@
   <body>
     <div class="infoHeader">
       <h>Food diary</h>
-      <div>{{ .Date}}</div>
+      <h1>{{ .Date}}</h1>
     </div>
 
 
-    <!-- <div class="choiceDate"></div> -->
-    
+    <form class="choiseDate">
+      <p>Choise date: <input type="date" name="calendar">
+      <input type="submit" value="submit"></p>
+    </form>
+      
 
     <div class="totalSum">
       <h>Total Sum:</h>

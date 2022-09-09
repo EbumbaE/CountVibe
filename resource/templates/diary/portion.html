@@ -2,11 +2,10 @@
 <div class="mealTable-item-form">
   <form method="POST">     
     <button name="button" value="delete::{{ .Product.ID}}">x</button>
-  </form>
+  </form> 
 
   <div>
-    <a>{{ .Product.Name}}</a>
-    <div>{{ .Amount}}{{ .Product.Unit}}</div>
+    <a>{{ .Product.Name}} {{ .Amount}}{{ .Product.Unit}}</a>
   </div>
 </div>
 

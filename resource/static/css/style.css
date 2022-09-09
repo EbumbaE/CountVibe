@@ -1,6 +1,6 @@
 @font-face {
   font-family: Raleway;
-  src: url("../../static/fonts/Raleway/Raleway-Medium.ttf") format("ttf");
+  src: url("../fonts/Raleway/Raleway-Medium.ttf") format("ttf");
 }
 body {
   margin: 0;
@@ -28,6 +28,17 @@ form {
   font-size: 3vw;
   font-weight: 600;
   color: rgb(76, 179, 76);
+}
+.infoHeader h1 {
+  font-size: 1.2vw;
+  font-weight: 600; 
+}
+
+.choiseDate {
+  width: 60%;
+  margin: 0 auto 5vh auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .totalSum {
@@ -81,6 +92,7 @@ form {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 5px 20px 1px rgba(31, 31, 49, 0.1);
+  height: 8vh;
 }
 .mealTable-item-form {
   display: grid;
