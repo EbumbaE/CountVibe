@@ -29,6 +29,15 @@ form {
   font-weight: 600;
   color: rgb(76, 179, 76);
 }
+.infoHeader h1 {
+  font-size: 1.2vw;
+  font-weight: 600;
+}
+
+.choiceDate {
+  width: 60%;
+  margin: 5% auto 0 auto;
+}
 
 .totalSum {
   border: solid 1px rgb(189, 189, 189);
@@ -86,6 +95,7 @@ form {
   display: grid;
   grid-template-columns: 1fr 5fr;
   align-items: center;
+  height: 8vh;
 }
 .mealTable-item-form button {
   background-color: rgb(179, 76, 76);
