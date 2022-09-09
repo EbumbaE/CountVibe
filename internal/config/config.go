@@ -28,18 +28,18 @@ func NewConfig() Config{
 		Server: server.Config{
 			Port: ":8080",
 			Paths: map[string]string{
-			    "home": "../../static/html/home.html",
+			    "static": 	"../../resource/static",
+			    "home": 	"../../resource/static/html/home.html",
 			},
 		},
 		Session: session.Config{
 			Paths: map[string]string{
-			    "static": 		 "../../static/",
-		    	"login": 		 "../../static/html/login.html",
-	    		"registration":  "../../static/html/registration.html",
-			    "user":   		 "../../static/html/user.html",
+		    	"login": 		 "../../resource/static/html/login.html",
+	    		"registration":  "../../resource/static/html/registration.html",
 			    
-			    "diary": 		 "../../static/html/diary/diary.html",
-			    "item":  		 "../../static/html/diary/portion.html",
+			    "user":   		 "../../resource/templates/user.html",
+			    "diary":	 "../../resource/templates/diary/diary.html",
+			    "item":			 "../../resource/templates/diary/portion.html",
 			},
 			FormatsPages: map[string]string{
 				"profile": "/%s/",

@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>CountVibe</title>
+  </head>
+  
+  <body>
+    <div class="infoHeader">
+      <h>Food diary</h>
+      <div>{{ .Date}}</div>
+    </div>
+
+
+    <!-- <div class="choiceDate"></div> -->
+    
+
+    <div class="totalSum">
+      <h>Total Sum:</h>
+      <div>
+        <div>
+          <h>Fats</h> <div>{{ .Total.Fats}}</div>
+        </div>
+        <div>
+          <h>Carbs</h> <div>{{ .Total.Carbohydrates}}</div>
+        </div>
+        <div>
+          <h>Prots</h> <div>{{ .Total.Proteins}}</div>
+        </div>
+        <div>
+          <h>Cals</h> <div>{{ .Total.Calories}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mealTable">
+      <div class="mealTable-info">
+        <h>Breakfast</h>
+        <div>
+          <div>{{ .Breakfast.CalcMeal.Fats}}</div>
+          <div>{{ .Breakfast.CalcMeal.Carbohydrates}}</div>
+          <div>{{ .Breakfast.CalcMeal.Proteins}}</div>
+          <div>{{ .Breakfast.CalcMeal.Calories}}</div>
+        </div>
+      </div>
+
+
+      <div class="mealTable-item">
+        {{range .Breakfast.Portions}}
+          {{block "portion" .}}{{end}}
+        {{end}}
+      </div>
+
+
+      <form class="mealTable-button" method="POST">
+          <button name="button" value="addToBreakfast">Add Item</button>
+      </form>
+    </div>
+
+
+    <div class="mealTable">
+      <div class="mealTable-info">
+        <h>Lunch</h>
+        <div>
+          <div>{{ .Lunch.CalcMeal.Fats}}</div>
+          <div>{{ .Lunch.CalcMeal.Carbohydrates}}</div>
+          <div>{{ .Lunch.CalcMeal.Proteins}}</div>
+          <div>{{ .Lunch.CalcMeal.Calories}}</div>
+        </div>
+      </div>
+
+
+      <div class="mealTable-item">
+        {{range .Lunch.Portions}}
+          {{block "portion" .}}{{end}}
+        {{end}}
+      </div>
+
+
+      <form class="mealTable-button" method="POST">
+          <button name="button" value="addToBreakfast">Add Item</button>
+      </form>
+    </div>
+
+
+    <div class="mealTable">
+      <div class="mealTable-info">
+        <h>Dinner</h>
+        <div>
+          <div>{{ .Dinner.CalcMeal.Fats}}</div>
+          <div>{{ .Dinner.CalcMeal.Carbohydrates}}</div>
+          <div>{{ .Dinner.CalcMeal.Proteins}}</div>
+          <div>{{ .Dinner.CalcMeal.Calories}}</div>
+        </div>
+      </div>
+
+
+      <div class="mealTable-item">
+        {{range .Dinner.Portions}}
+          {{block "portion" .}}{{end}}
+        {{end}}
+      </div>
+
+
+      <form class="mealTable-button" method="POST">
+          <button name="button" value="addToBreakfast">Add Item</button>
+      </form>
+    </div>
+
+    <div class="mealTable">
+      <div class="mealTable-info">
+        <h>Snacks</h>
+        <div>
+          <div>{{ .Snacks.CalcMeal.Fats}}</div>
+          <div>{{ .Snacks.CalcMeal.Carbohydrates}}</div>
+          <div>{{ .Snacks.CalcMeal.Proteins}}</div>
+          <div>{{ .Snacks.CalcMeal.Calories}}</div>
+        </div>
+      </div>
+
+
+      <div class="mealTable-item">
+        {{range .Snacks.Portions}}
+          {{block "portion" .}}{{end}}
+        {{end}}
+      </div>
+
+
+      <form class="mealTable-button" method="POST">
+          <button name="button" value="addToBreakfast">Add Item</button>
+      </form>
+    </div>
+
+  </body>
+</html>

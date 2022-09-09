@@ -36,6 +36,27 @@ func GetViewDiaryData(date string, isLogin bool)(ViewDiaryData){
                     Carbohydrates: 12,
                 },
             },
+            Portion{
+                Product: Product{
+                    ID: 1,
+                    Name: "kuraga",
+                    UnitComposition: Composition{
+                        Calories: 365,
+                        Proteins: 1,
+                        Fats: 40,
+                        Carbohydrates: 12,
+                    },
+                    Unit: "gr",
+                    AmountUnit: 100,
+                },
+                Amount: 0,
+                CalcPortion: Composition{
+                    Calories: 365,
+                    Proteins: 1,
+                    Fats: 40,
+                    Carbohydrates: 12,
+                },
+            },
         },
         CountOrder: 0,
         CalcMeal: Composition{

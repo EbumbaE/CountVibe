@@ -1,0 +1,19 @@
+{{define "portion"}}
+<div class="mealTable-item-form">
+  <form method="POST">     
+    <button name="button" value="delete::{{ .Product.ID}}">x</button>
+  </form>
+
+  <div>
+    <a>{{ .Product.Name}}</a>
+    <div>{{ .Amount}}{{ .Product.Unit}}</div>
+  </div>
+</div>
+
+<div class="mealTable-item-results">
+  <div>{{ .CalcPortion.Fats}}</div>
+  <div>{{ .CalcPortion.Carbohydrates}}</div>
+  <div>{{ .CalcPortion.Proteins}}</div>
+  <div>{{ .CalcPortion.Calories}}</div>
+</div>
+{{end}}

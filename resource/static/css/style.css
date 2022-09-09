@@ -1,0 +1,120 @@
+@font-face {
+  font-family: Raleway;
+  src: url("../fonts/Raleway/Raleway-Medium.ttf") format("ttf");
+}
+body {
+  margin: 0;
+  padding: 0;
+  background-color: aliceblue;
+  font-family: Raleway;
+}
+
+button {
+  cursor: pointer;
+}
+
+form {
+  margin: 0;
+}
+
+.infoHeader {
+  width: 60%;
+  height: 10vh;
+  margin: 5% auto 0 auto;
+  display: grid;
+  align-items: center;
+}
+.infoHeader h {
+  font-size: 3vw;
+  font-weight: 600;
+  color: rgb(76, 179, 76);
+}
+
+.totalSum {
+  border: solid 1px rgb(189, 189, 189);
+  width: 60%;
+  height: 10vh;
+  margin: 0 auto 5vh auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+.totalSum > h {
+  display: grid;
+  align-items: center;
+  font-size: 2vw;
+  margin-left: 20px;
+}
+.totalSum > div {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  justify-items: center;
+}
+.totalSum > div h {
+  font-size: 1vw;
+}
+.totalSum > div div {
+  display: grid;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.mealTable {
+  width: 60%;
+  margin: auto;
+}
+.mealTable-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  height: 5vh;
+}
+.mealTable-info > div {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  justify-items: center;
+}
+.mealTable-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 5px 20px 1px rgba(31, 31, 49, 0.1);
+}
+.mealTable-item-form {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  align-items: center;
+}
+.mealTable-item-form button {
+  background-color: rgb(179, 76, 76);
+  border: none;
+  border-radius: 5px;
+  color: white;
+}
+.mealTable-item-results {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  justify-items: center;
+}
+.mealTable-button {
+  display: grid;
+  justify-content: end;
+  height: 5vh;
+  margin-top: 1vh;
+}
+.mealTable-button button {
+  background-color: transparent;
+  border: solid 2px rgb(76, 179, 76);
+  height: 30px;
+  width: 80px;
+}
+.mealTable-button button:hover {
+  background-color: rgb(76, 179, 76);
+  color: white;
+  transition: 0.3s;
+}
+
+/*# sourceMappingURL=style.css.map */

@@ -69,7 +69,6 @@ func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
 }
 
 func (s *Session)userLogout(w http.ResponseWriter, r *http.Request){
-    //moveTokenInBlacklist()
     deleteCookie(w)
     
     ad, err := s.getAuthDetails(r)
@@ -103,9 +102,9 @@ func (s *Session)verificationUserID(authD *AuthDetails)(bool, error){
     return true, nil
 }   
 
-func (s *Session)newTemplate(w http.ResponseWriter, data any, path string) error{
+func (s *Session)newTemplate(w http.ResponseWriter, data any, paths []string) error{
     
-    ts, err := template.ParseFiles(path)
+    ts, err := template.ParseFiles(paths...)
     if err != nil {
         return err
     }
@@ -162,15 +161,17 @@ func (s *Session)userHandler(w http.ResponseWriter, r *http.Request){
             data := ViewUserData{
                 IsLogin: isLogin,
             }
-            path := s.paths["user"]
-            if err := s.newTemplate(w, data, path); err != nil{
+            paths := []string{
+                s.paths["user"],
+            }
+            if err := s.newTemplate(w, data, paths); err != nil{
                 s.Logger.Error(err, "new Template")
                 http.Error(w, "error in create Template", http.StatusInternalServerError)
             }
         case "POST":
             err := r.ParseForm()
             if err != nil {
-                fmt.Println("parse form ", err)
+                fmt.Fprintf(w, "parse form err: %v", err)
                 return
             }
             button := r.FormValue("button")
@@ -196,21 +197,16 @@ func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
 
     switch r.Method {
         case "GET":
+
             data := entities.GetViewDiaryData("06.05.2020", isLogin)
 
             paths := []string{
                 s.paths["diary"],
                 s.paths["item"],   
             }
-            ts, err := template.ParseFiles(paths...)
-            if err != nil {
-                s.Logger.Error(err, "template parse files")     
-                return
-            }
-         
-            err = ts.Execute(w, data)
-            if err != nil {
-                s.Logger.Error(err, "template execute")
+            if err := s.newTemplate(w, data, paths); err != nil{
+                s.Logger.Error(err, "new Template")
+                http.Error(w, "error in create Template", http.StatusInternalServerError)
             }
     }
 }
