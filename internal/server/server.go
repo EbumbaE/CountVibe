@@ -56,10 +56,8 @@ func (s *Server) homeHandler(w http.ResponseWriter, r *http.Request){
 }
 
 func (s *Server) setupServerHandlers(){
-	pages := s.pages
-	http.HandleFunc(pages["begin"], s.beginHandler)
-	http.HandleFunc(pages["home"], s.homeHandler)
+	http.HandleFunc(s.pages["begin"], s.beginHandler)
+	http.HandleFunc(s.pages["home"], s.homeHandler)
 
-	paths := s.paths
-	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir(paths["static"]))))
+	http.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir(s.paths["static"]))))
 }
