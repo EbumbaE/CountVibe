@@ -10,7 +10,6 @@ import (
 
     "github.com/dgrijalva/jwt-go"
     "CountVibe/internal/database"
-    "CountVibe/internal/entities"
 )
 
 type AuthDetails struct{
@@ -23,20 +22,6 @@ type User struct{
     username string `yaml:"username"`
     password string `yaml:"password"`
     isOnline bool `yaml:"isOnline"`
-}
-
-func deleteCookie(w http.ResponseWriter){
-    access := &http.Cookie{
-        Name: "access_token",
-        MaxAge: -1,
-    }
-    http.SetCookie(w, access)
-
-    refresh := &http.Cookie{
-        Name: "refresh_token",
-        MaxAge: -1,
-    }
-    http.SetCookie(w, refresh)
 }
 
 func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
@@ -69,7 +54,7 @@ func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
 }
 
 func (s *Session)userLogout(w http.ResponseWriter, r *http.Request){
-    deleteCookie(w)
+    deleteTokensCookie(w)
     
     ad, err := s.getAuthDetails(r)
     if err != nil {
@@ -186,27 +171,4 @@ func (s *Session)userHandler(w http.ResponseWriter, r *http.Request){
                 }
             }
     }    
-}
-
-func (s *Session)diaryHandler(w http.ResponseWriter, r *http.Request){
-    
-    isLogin, err := s.compareLogin(r)
-    if err != nil{
-        s.Logger.Error(err, "Login verification")
-    }
-
-    switch r.Method {
-        case "GET":
-
-            data := entities.GetViewDiaryData("06.05.2020", isLogin)
-
-            paths := []string{
-                s.paths["diary"],
-                s.paths["item"],   
-            }
-            if err := s.newTemplate(w, data, paths); err != nil{
-                s.Logger.Error(err, "new Template")
-                http.Error(w, "error in create Template", http.StatusInternalServerError)
-            }
-    }
 }

@@ -37,15 +37,12 @@ func NewSession(c Config, confpages map[string]string, logger log.Logger) *Sessi
 }
 
 func (s *Session) setupDefaultHandlers(){
-    pages := s.pages
-    http.HandleFunc(pages["login"], s.loginHandler)
-    http.HandleFunc(pages["registration"], s.registrationHandler)
-    http.HandleFunc(pages["refresh"], s.refreshHandler)     
+    http.HandleFunc(s.pages["login"], s.loginHandler)
+    http.HandleFunc(s.pages["registration"], s.registrationHandler)
+    http.HandleFunc(s.pages["refresh"], s.refreshHandler)     
 }
 
 func (s *Session) restoreUserHandlers(){
-    
-    formats := s.formatsPages
     
     usernames, err := database.GetAllUsernames()
     if err != nil{
@@ -54,8 +51,8 @@ func (s *Session) restoreUserHandlers(){
     }
 
     for _, username := range usernames{
-        urlProfile := fmt.Sprintf(formats["profile"], username)
-        urlDiary := fmt.Sprintf(formats["diary"], username)
+        urlProfile := fmt.Sprintf(s.formatsPages["profile"], username)
+        urlDiary := fmt.Sprintf(s.formatsPages["diary"], username)
         
         http.HandleFunc(urlProfile, s.userHandler)
         http.HandleFunc(urlDiary, s.diaryHandler)
@@ -174,10 +171,9 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request){
                 return
             }
 
-            saveTokensInCookie(w, tokens)
+            saveTokensCookie(w, tokens)
 
-            formats := s.formatsPages
-            urlProfile := fmt.Sprintf(formats["profile"], username)
+            urlProfile := fmt.Sprintf(s.formatsPages["profile"], username)
             http.Redirect(w, r, urlProfile, http.StatusFound) 
     }
 }
@@ -239,11 +235,10 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request){
                 return
             }
 
-            saveTokensInCookie(w, tokens)
+            saveTokensCookie(w, tokens)
 
-            formats := s.formatsPages
-            urlProfile := fmt.Sprintf(formats["profile"], username)
-            urlDiary := fmt.Sprintf(formats["diary"], username)
+            urlProfile := fmt.Sprintf(s.formatsPages["profile"], username)
+            urlDiary := fmt.Sprintf(s.formatsPages["diary"], username)
             http.HandleFunc(urlProfile, s.userHandler)
             http.HandleFunc(urlDiary, s.diaryHandler)
 
@@ -307,6 +302,6 @@ func (s *Session) refreshHandler(w http.ResponseWriter, r *http.Request){
         return
     }
     
-    saveTokensInCookie(w, tokens)
+    saveTokensCookie(w, tokens)
     
 }

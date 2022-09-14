@@ -145,7 +145,7 @@ func newTokens(userID int64, jwtKey map[string][]byte)(*Tokens, error){
     return t, nil
 }
 
-func saveTokensInCookie(w http.ResponseWriter, t *Tokens){    
+func saveTokensCookie(w http.ResponseWriter, t *Tokens){    
         
     access := (*t).access
     refresh := (*t).refresh
@@ -162,6 +162,19 @@ func saveTokensInCookie(w http.ResponseWriter, t *Tokens){
         Expires: time.Unix(refresh.expires, 0),
         HttpOnly: true,
     })
+}
+func deleteTokensCookie(w http.ResponseWriter){
+    access := &http.Cookie{
+        Name: "access_token",
+        MaxAge: -1,
+    }
+    http.SetCookie(w, access)
+
+    refresh := &http.Cookie{
+        Name: "refresh_token",
+        MaxAge: -1,
+    }
+    http.SetCookie(w, refresh)
 }
 
 func GetjwtToken(r *http.Request, jwtKey []byte, tokenType string)(*jwt.Token, error){

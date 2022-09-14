@@ -1,12 +1,5 @@
 package client
 
-import (
-	"fmt"
-	"os"
-)
-
-func main() { 
-
-	
+func main() {
 
 }

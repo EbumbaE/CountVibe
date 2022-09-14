@@ -11,9 +11,9 @@
       <h1>{{ .Date}}</h1>
     </div>
 
-    <form class="choiceDate">
-      <p>Date: <input type="date" name="calendar">
-      <input type="submit" value="submit"></p>
+    <form class="choiceDate" method="POST">
+      <p>Date: <input type="date" name="calendar" value="2022-02-01">
+      <input type="submit" value="submit" min="2020-12-01" max="2030-12-01"></p>
     </form>
 
     <div class="totalSum">
@@ -53,10 +53,11 @@
         {{end}}
       </div>
 
-
-      <form class="mealTable-button" method="POST">
-          <button name="button" value="addToBreakfast">Add Item</button>
-      </form>
+      {{if .IsLogin}}
+        <form class="mealTable-button" method="POST">
+            <button name="button" value="addItem">Add Item</button>
+        </form>
+      {{end}}
     </div>
 
 
@@ -78,10 +79,11 @@
         {{end}}
       </div>
 
-
-      <form class="mealTable-button" method="POST">
-          <button name="button" value="addToBreakfast">Add Item</button>
-      </form>
+      {{if .IsLogin}}
+        <form class="mealTable-button" method="POST">
+            <button name="button" value="addItem">Add Item</button>
+        </form>
+      {{end}}
     </div>
 
 
@@ -103,10 +105,11 @@
         {{end}}
       </div>
 
-
-      <form class="mealTable-button" method="POST">
-          <button name="button" value="addToBreakfast">Add Item</button>
-      </form>
+      {{if .IsLogin}}
+        <form class="mealTable-button" method="POST">
+            <button name="button" value="addItem">Add Item</button>
+        </form>
+      {{end}}
     </div>
 
     <div class="mealTable">
@@ -127,10 +130,11 @@
         {{end}}
       </div>
 
-
-      <form class="mealTable-button" method="POST">
-          <button name="button" value="addToBreakfast">Add Item</button>
-      </form>
+      {{if .IsLogin}}
+        <form class="mealTable-button" method="POST">
+            <button name="button" value="addItem">Add Item</button>
+        </form>
+      {{end}}
     </div>
 
   </body>
