@@ -57,6 +57,17 @@
         <form class="mealTable-button" method="POST">
             <button name="button" value="addItem">Add Item</button>
         </form>
+
+        <div class="mealTable-search">
+          <form method="POST">     
+            <label>Search</label><input name="search" type="text" value="" />
+            <input type="submit" value="search" />
+          </form>
+          
+            {{range .Search}}
+              {{block "product" .}}{{end}}
+            {{end}}
+        </div>
       {{end}}
     </div>
 

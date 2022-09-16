@@ -1,17 +1,17 @@
 package entities
 
-type statistic interface{
+type statistic interface {
 	Day() Composition
 	Week() Composition
 	Month() Composition
 }
 
-type Week struct{
+type Week struct {
 	total Composition
-	goal Composition
+	goal  Composition
 }
 
-type Month struct{
+type Month struct {
 	total Composition
-	goal Composition
+	goal  Composition
 }
