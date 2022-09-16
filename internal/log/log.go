@@ -1,6 +1,6 @@
 package log
 
-type Logger interface{
+type Logger interface {
 	Process(...any)
 	Error(...any)
 }

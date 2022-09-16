@@ -3,7 +3,7 @@ package main
 import (
 	"CountVibe/internal/certificate"
 	"CountVibe/internal/config"
-	"CountVibe/internal/database"
+	database "CountVibe/internal/database/psql"
 	"CountVibe/internal/log"
 	"CountVibe/internal/server"
 	"CountVibe/internal/session"

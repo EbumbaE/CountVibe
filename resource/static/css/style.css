@@ -83,6 +83,26 @@ form {
   grid-template-columns: repeat(4, 1fr);
   justify-items: center;
 }
+
+.mealTable-search{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  height: 5vh;
+}
+.mealTable-additem-form{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 20px;
+  border-radius: 5px;
+}
+.mealTable-additem-info{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  height: 5vh;
+}
+
 .mealTable-item {
   display: grid;
   grid-template-columns: 1fr 1fr;

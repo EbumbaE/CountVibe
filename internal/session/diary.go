@@ -46,7 +46,7 @@ func correctDate(date string) (string, error) {
 func getDateCookie(r *http.Request) string {
 	c, err := r.Cookie("request_date")
 	if err != nil {
-		return time.Now().Format("01.02.2006")
+		return time.Now().Format("02.01.2006")
 	}
 	return c.Value
 }
@@ -69,8 +69,8 @@ func diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool) error 
 		button := r.FormValue("button")
 
 		if od := getOrderMeal(button); od != -1 {
-			dateCookie := getDateCookie(r)
 
+			dateCookie := getDateCookie(r)
 			date, err := correctDate(dateCookie)
 			if err != nil {
 				return err
@@ -127,6 +127,7 @@ func (s *Session) diaryHandler(w http.ResponseWriter, r *http.Request) {
 		paths := []string{
 			s.paths["diary"],
 			s.paths["item"],
+			s.paths["product"],
 		}
 		if err := s.newTemplate(w, diaryData, paths); err != nil {
 			s.Logger.Error(err, "new Template")

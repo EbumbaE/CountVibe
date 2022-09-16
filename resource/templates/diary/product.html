@@ -1,0 +1,19 @@
+{{define "product"}}
+<div class="mealTable-additem-form">
+    <form method="POST">     
+        
+        <button name="add" value="choice::{{ .ID}}">+</button>
+        
+        <div>{{ .Name}}</div>
+        <label>amount</label><input name="amount" type="text" value="" /> {{ .Unit}}
+    </form>
+    
+</div>
+
+<div class="mealTable-additem-info">
+  <div>{{ .UnitComposition.Fats}}</div>
+  <div>{{ .UnitComposition.Carbohydrates}}</div>
+  <div>{{ .UnitComposition.Proteins}}</div>
+  <div>{{ .UnitComposition.Calories}}</div>
+</div>
+{{end}}

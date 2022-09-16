@@ -1,17 +1,17 @@
 package log
 
-import(
-	"os"
+import (
 	"log"
+	"os"
 )
 
-type FileLogger struct{
-	file *os.File
+type FileLogger struct {
+	file          *os.File
 	processLogger *log.Logger
-	errorLogger *log.Logger
+	errorLogger   *log.Logger
 }
 
-func NewLogger(path string)(*FileLogger, error){
+func NewLogger(path string) (*FileLogger, error) {
 
 	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
