@@ -3,6 +3,7 @@ package session
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/go-redis/redis/v7"
 
@@ -63,11 +64,26 @@ func (s *Session) setupSessionHandlers() {
 	s.restoreUserHandlers()
 }
 
+func (s *Session) setupIdGenerator() {
+	strLastID, err := s.db.GetLastUserID()
+	if err != nil {
+		s.Logger.Process(err, "Get last userID")
+		return
+	}
+	lastID, convErr := strconv.ParseInt(strLastID, 10, 64)
+	if convErr != nil {
+		s.Logger.Error(convErr, "convertation last userID")
+		return
+	}
+	s.idGenerator.setID(lastID)
+}
+
 func (s *Session) Run() {
 	s.newTokensDB()
 	if err := s.checkHealthTokensDB(); err != nil {
-		s.Logger.Error("check health TokensDB")
+		s.Logger.Error(err, "check health TokensDB")
 		return
 	}
 	s.setupSessionHandlers()
+	s.setupIdGenerator()
 }

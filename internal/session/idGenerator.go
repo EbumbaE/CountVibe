@@ -13,3 +13,9 @@ func (g *IDGenerator) newID() int64 {
 	g.id++
 	return g.id
 }
+
+func (g *IDGenerator) setID(id int64) {
+	g.Lock()
+	defer g.Unlock()
+	g.id = id
+}
