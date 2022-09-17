@@ -9,8 +9,6 @@ import (
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
-
-	database "CountVibe/internal/database/psql"
 )
 
 type AuthDetails struct {
@@ -110,7 +108,7 @@ func (s *Session) compareLogin(r *http.Request) (bool, error) {
 	lenUsername := len(firstRes)
 	username := firstRes[1 : lenUsername-1]
 
-	strPathUserID, err := database.GetUserID(username)
+	strPathUserID, err := s.db.GetUserID(username)
 	if err != nil {
 		return false, err
 	}

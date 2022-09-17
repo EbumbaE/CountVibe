@@ -2,9 +2,9 @@ package config
 
 import (
 	"CountVibe/internal/certificate"
-	database "CountVibe/internal/database/psql"
 	"CountVibe/internal/server"
 	"CountVibe/internal/session"
+	"CountVibe/internal/storage/psql"
 )
 
 type Config struct {
@@ -12,7 +12,7 @@ type Config struct {
 	Server      server.Config      `yaml:"server"`
 	Session     session.Config     `yaml:"middleware"`
 	Certificate certificate.Config `yaml:"certificate"`
-	Database    database.Database
+	Database    psql.Config
 }
 
 func NewConfig() Config {
@@ -55,7 +55,7 @@ func NewConfig() Config {
 			CertPath: "../../internal/certificate/cert.pem",
 			KeyPath:  "../../internal/certificate/key.pem",
 		},
-		Database: database.Database{
+		Database: psql.Config{
 			Info: "host=localhost port=5432 user=Ebumba password=1234 dbname=abobus sslmode=disable",
 		},
 	}
