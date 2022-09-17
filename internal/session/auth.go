@@ -6,80 +6,16 @@ import (
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-redis/redis/v7"
 	"golang.org/x/crypto/bcrypt"
-
-	database "CountVibe/internal/database/psql"
-	"CountVibe/internal/log"
 )
 
-type Session struct {
-	pages        map[string]string
-	paths        map[string]string
-	formatsPages map[string]string
-	jwtKey       map[string][]byte
+func (s *Session) verifyUserPass(username, password string) (bool, error) {
 
-	idGenerator IDGenerator
-	Logger      log.Logger
-	tokensDB    *redis.Client
-}
-
-func NewSession(c Config, confpages map[string]string, logger log.Logger) *Session {
-	return &Session{
-		pages:        confpages,
-		paths:        c.Paths,
-		formatsPages: c.FormatsPages,
-		jwtKey:       c.JwtKey,
-
-		idGenerator: IDGenerator{id: 0},
-		Logger:      logger,
-	}
-}
-
-func (s *Session) setupDefaultHandlers() {
-	http.HandleFunc(s.pages["login"], s.loginHandler)
-	http.HandleFunc(s.pages["registration"], s.registrationHandler)
-	http.HandleFunc(s.pages["refresh"], s.refreshHandler)
-}
-
-func (s *Session) restoreUserHandlers() {
-
-	usernames, err := database.GetAllUsernames()
-	if err != nil {
-		s.Logger.Error(err, "get all usernames")
-		return
-	}
-
-	for _, username := range usernames {
-		urlProfile := fmt.Sprintf(s.formatsPages["profile"], username)
-		urlDiary := fmt.Sprintf(s.formatsPages["diary"], username)
-
-		http.HandleFunc(urlProfile, s.userHandler)
-		http.HandleFunc(urlDiary, s.diaryHandler)
-	}
-}
-
-func (s *Session) setupSessionHandlers() {
-	s.setupDefaultHandlers()
-	s.restoreUserHandlers()
-}
-
-func (s *Session) Run() {
-	s.newTokensDB()
-	if err := s.checkHealthTokensDB(); err != nil {
-		s.Logger.Error("check health TokensDB")
-		return
-	}
-	s.setupSessionHandlers()
-}
-
-func verifyUserPass(username, password string) (bool, error) {
-
-	if hasUser, err := database.CheckUsernameInDB(username); err != nil || !hasUser {
+	if hasUser, err := s.db.CheckUsernameInDB(username); err != nil || !hasUser {
 		return false, err
 	}
 
-	rightPass, err := database.GetUserPassword(username)
+	rightPass, err := s.db.GetUserPassword(username)
 	if err != nil {
 		return false, err
 	}
@@ -113,7 +49,7 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request) {
 		ad, err := s.getAuthDetails(r)
 
 		strUserID := strconv.FormatInt(ad.userID, 10)
-		username, err := database.GetUsername(strUserID)
+		username, err := s.db.GetUsername(strUserID)
 		if err == nil {
 			url := "/" + username
 			http.Redirect(w, r, url, http.StatusFound)
@@ -135,7 +71,7 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
-		ok, err := verifyUserPass(username, password)
+		ok, err := s.verifyUserPass(username, password)
 		if err != nil {
 			s.Logger.Error(err, "verify user password")
 		}
@@ -145,7 +81,7 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		strUserID, err := database.GetUserID(username)
+		strUserID, err := s.db.GetUserID(username)
 		if err != nil {
 			s.Logger.Error(err, "get userID")
 			w.WriteHeader(http.StatusUnauthorized)
@@ -199,7 +135,7 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request) {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
-		hasUser, err := database.CheckUsernameInDB(username)
+		hasUser, err := s.db.CheckUsernameInDB(username)
 		if err != nil {
 			s.Logger.Error(err, "check user in db")
 		}
@@ -218,7 +154,7 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request) {
 		userID := s.idGenerator.newID()
 		strUserID := strconv.FormatInt(userID, 10)
 
-		if err := database.InsertNewUser(strUserID, username, hash); err != nil {
+		if err := s.db.InsertNewUser(strUserID, username, hash); err != nil {
 			s.Logger.Error(err, "insert new user in db")
 			return
 		}

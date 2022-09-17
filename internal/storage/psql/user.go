@@ -1,50 +1,11 @@
 package psql
 
 import (
-	"database/sql"
-
 	_ "github.com/lib/pq"
 )
 
-type Database struct {
-	driverConn *sql.DB
-	Info       string
-}
-
-var database *Database
-
-func Init(config Database) error {
-
-	connectionInfo := config.Info
-	driverConn, err := sql.Open("postgres", connectionInfo)
-	if err != nil {
-		return err
-	}
-
-	database = &Database{
-		driverConn: driverConn,
-		Info:       connectionInfo,
-	}
-
-	return err
-}
-
-func CheckHealth() (bool, error) {
-	driverConn := database.driverConn
-	err := driverConn.Ping()
-	if err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
-func Close() {
-	driverConn := database.driverConn
-	driverConn.Close()
-}
-
-func InsertNewUser(id, username, password string) error {
-	driverConn := database.driverConn
+func (d *Postgres) InsertNewUser(id, username, password string) error {
+	driverConn := d.driverConn
 
 	dbRequest := `INSERT INTO users (id, username, password) VALUES ($1, $2, $3)`
 	_, err := driverConn.Exec(dbRequest, id, username, password)
@@ -52,8 +13,8 @@ func InsertNewUser(id, username, password string) error {
 	return err
 }
 
-func GetUsername(userID string) (string, error) {
-	driverConn := database.driverConn
+func (d *Postgres) GetUsername(userID string) (string, error) {
+	driverConn := d.driverConn
 
 	dbRequest := `SELECT id, username FROM users WHERE id=$1`
 	var username string = ""
@@ -66,8 +27,8 @@ func GetUsername(userID string) (string, error) {
 	return username, err
 }
 
-func GetUserID(username string) (string, error) {
-	driverConn := database.driverConn
+func (d *Postgres) GetUserID(username string) (string, error) {
+	driverConn := d.driverConn
 
 	dbRequest := `SELECT id, username FROM users WHERE username=$1`
 	var userID string = ""
@@ -80,8 +41,8 @@ func GetUserID(username string) (string, error) {
 	return userID, err
 }
 
-func GetUserPassword(username string) (string, error) {
-	driverConn := database.driverConn
+func (d *Postgres) GetUserPassword(username string) (string, error) {
+	driverConn := d.driverConn
 
 	dbRequest := `SELECT username, password FROM users WHERE username=$1`
 	var password string = ""
@@ -95,8 +56,8 @@ func GetUserPassword(username string) (string, error) {
 
 }
 
-func CheckUsernameInDB(username string) (bool, error) {
-	driverConn := database.driverConn
+func (d *Postgres) CheckUsernameInDB(username string) (bool, error) {
+	driverConn := d.driverConn
 
 	dbRequest := `SELECT username FROM users WHERE username=$1`
 	rows, err := driverConn.Query(dbRequest, username)
@@ -117,8 +78,8 @@ func CheckUsernameInDB(username string) (bool, error) {
 	return false, nil
 }
 
-func DeleteUser(username string) error { //todo
-	driverConn := database.driverConn
+func (d *Postgres) DeleteUser(username string) error { //todo
+	driverConn := d.driverConn
 
 	dbRequest := `DELETE FROM users WHERE username=$1`
 	_, err := driverConn.Exec(dbRequest, username)
@@ -126,8 +87,8 @@ func DeleteUser(username string) error { //todo
 	return err
 }
 
-func GetAllUsernames() ([]string, error) { //so bad
-	driverConn := database.driverConn
+func (d *Postgres) GetAllUsernames() (chan string, error) {
+	driverConn := d.driverConn
 
 	dbRequest := `SELECT username FROM users`
 	rows, err := driverConn.Query(dbRequest)
@@ -136,15 +97,20 @@ func GetAllUsernames() ([]string, error) { //so bad
 	}
 
 	var getUsername string = ""
-	var usernames []string
+	returnChan := make(chan string)
 
-	for rows.Next() {
-		if err := rows.Scan(&getUsername); err != nil {
-			return nil, err
+	go func() error {
+		defer close(returnChan)
+
+		for rows.Next() {
+			if err := rows.Scan(&getUsername); err != nil {
+				return err
+			}
+			returnChan <- getUsername
 		}
-		usernames = append(usernames, getUsername)
-	}
 
-	return usernames, nil
+		return nil
+	}()
 
+	return returnChan, nil
 }
