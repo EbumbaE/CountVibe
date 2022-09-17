@@ -59,11 +59,7 @@ func saveDateCookie(w http.ResponseWriter, date string) {
 	})
 }
 
-func addItem(date string, id int64, amount float64, od orderMeal) {
-
-}
-
-func diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool) error {
+func (s *Session) diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool) error {
 
 	if isLogin {
 		button := r.FormValue("button")
@@ -92,7 +88,7 @@ func diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool) error 
 					}
 
 					if strID != "" && strAmount != "" {
-						addItem(date, id, amount, od)
+						s.db.AddItem(date, id, amount, int64(od))
 					}
 				}
 			}
@@ -139,7 +135,7 @@ func (s *Session) diaryHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "parse form err: %v", err)
 			return
 		}
-		if err := diaryFormCheck(w, r, isLogin); err != nil {
+		if err := s.diaryFormCheck(w, r, isLogin); err != nil {
 			s.Logger.Error(err, " Diary Form Check")
 		}
 

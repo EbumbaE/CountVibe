@@ -41,6 +41,21 @@ func (d *Postgres) GetUserID(username string) (string, error) {
 	return userID, err
 }
 
+func (d *Postgres) GetLastUserID() (string, error) {
+	driverConn := d.driverConn
+
+	dbRequest := `SELECT id FROM users ORDER BY id DESC LIMIT 1`
+	var userID string = ""
+	err := driverConn.QueryRow(dbRequest).Scan(&userID)
+
+	if err != nil {
+		return "", err
+	}
+
+	return userID, err
+
+}
+
 func (d *Postgres) GetUserPassword(username string) (string, error) {
 	driverConn := d.driverConn
 
