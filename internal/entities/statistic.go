@@ -1,9 +1,9 @@
 package entities
 
 type statistic interface {
-	Day() Composition
-	Week() Composition
-	Month() Composition
+	Day()
+	Week()
+	Month()
 }
 
 type Week struct {

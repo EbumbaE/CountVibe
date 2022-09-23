@@ -1,5 +1,11 @@
 package entities
 
+type Calculator interface {
+	NewPorcion(product Product, amount float64) Portion
+	SumPortions(portions ...Portion) Composition
+	SumDayMeals(meals ...Meal) Composition
+}
+
 type Portion struct {
 	Product     Product
 	Amount      float64
@@ -8,52 +14,67 @@ type Portion struct {
 
 type Meal struct {
 	Portions   []Portion
-	CountOrder int
+	CountOrder OrderMeal
 	CalcMeal   Composition
 }
 
 type DayMeals struct {
 	Meals        []Meal
-	Date         string
 	CalcDayMeals Composition
 }
 
-func divProductOnAmountUnit(product Product) Composition {
+func SetPorcion(product Product, amount float64) Portion {
 
-	amountUnit := product.AmountUnit
-	composition := product.UnitComposition
-
-	composition.divCompositionOn(amountUnit)
-	return composition
-}
-
-func (p Portion) сalcPorcion() {
-
-	product := p.Product
-	calcPortion := divProductOnAmountUnit(product)
-
-	amount := p.Amount
+	calcPortion := product.divProductOnUnit()
 	calcPortion.multCompositionOn(amount)
+	calcPortion.roundComposition()
 
-	p.CalcPortion = calcPortion
+	return Portion{
+		Product:     product,
+		Amount:      amount,
+		CalcPortion: calcPortion,
+	}
 }
 
-func (m Meal) сalcMeal() {
+func SetMeal(portions []Portion, om OrderMeal) Meal {
+	m := Meal{}
+	m.Portions = portions
+	m.SumPortions()
+	m.CountOrder = om
+	return m
+}
+func NewPorcions() []Portion {
+	return make([]Portion, 0)
+}
 
-	calcMeal := Composition{0, 0, 0, 0}
+func NewMeals(amount int64) []Meal {
+	return make([]Meal, amount)
+}
+
+func NewDayMeals(meals []Meal) *DayMeals {
+	dm := &DayMeals{}
+	dm.Meals = meals
+	dm.SumDayMeals()
+	return dm
+}
+
+func (m *Meal) SumPortions() {
+
+	sumPortions := Composition{0, 0, 0, 0}
 	for _, portion := range m.Portions {
 		c := portion.CalcPortion
-		calcMeal.addComposition(c)
+		sumPortions.addComposition(c)
 	}
-	m.CalcMeal = calcMeal
+
+	m.CalcMeal = sumPortions
 }
 
-func (m DayMeals) сalcDayMeal() {
+func (d *DayMeals) SumDayMeals() {
 
-	calcDayMeals := Composition{0, 0, 0, 0}
-	for _, meel := range m.Meals {
+	sumDayMeals := Composition{0, 0, 0, 0}
+	for _, meel := range d.Meals {
 		c := meel.CalcMeal
-		calcDayMeals.addComposition(c)
+		sumDayMeals.addComposition(c)
 	}
-	m.CalcDayMeals = calcDayMeals
+	d.CalcDayMeals = sumDayMeals
 }

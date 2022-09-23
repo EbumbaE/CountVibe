@@ -3,6 +3,7 @@ package session
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/go-redis/redis/v7"
@@ -76,6 +77,18 @@ func (s *Session) setupIdGenerator() {
 		return
 	}
 	s.idGenerator.setID(lastID)
+}
+
+func (s *Session) parseUsernameFromURL(r *http.Request) string {
+
+	url := r.URL.Path
+	pattern := `/[a-zA-Z0-9]+/`
+	re, _ := regexp.Compile(pattern)
+	res := re.FindAllString(url, -1)
+	firstRes := res[0]
+	lenUsername := len(firstRes)
+
+	return firstRes[1 : lenUsername-1]
 }
 
 func (s *Session) Run() {

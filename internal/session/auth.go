@@ -47,6 +47,10 @@ func (s *Session) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if ok {
 		ad, err := s.getAuthDetails(r)
+		if err != nil {
+			s.Logger.Error(err, "get auth details")
+			return
+		}
 
 		strUserID := strconv.FormatInt(ad.userID, 10)
 		username, err := s.db.GetUsername(strUserID)

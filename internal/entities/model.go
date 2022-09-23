@@ -1,6 +1,18 @@
 package entities
 
-type ViewDiaryData struct {
+type OrderMeal int64
+
+const (
+	Breakfast OrderMeal = iota
+	Lunch
+	Dinner
+	Snacks
+
+	BeginMeal = Breakfast
+	EndMeal   = Snacks
+)
+
+type ViewDayData struct {
 	IsLogin bool
 
 	Date  string
@@ -14,7 +26,23 @@ type ViewDiaryData struct {
 	Snacks    Meal
 }
 
-func GetViewDiaryData(date string, isLogin bool) ViewDiaryData {
+func NewViewDayData(date string, isLogin bool, search []Product, dm *DayMeals) ViewDayData {
+	return ViewDayData{
+		IsLogin: isLogin,
+		Date:    date,
+
+		Total: dm.CalcDayMeals,
+
+		Search: search,
+
+		Breakfast: dm.Meals[Breakfast],
+		Lunch:     dm.Meals[Lunch],
+		Dinner:    dm.Meals[Dinner],
+		Snacks:    dm.Meals[Snacks],
+	}
+}
+
+func plugNewViewDayData(date string, isLogin bool) ViewDayData {
 
 	search := []Product{
 		Product{
@@ -84,7 +112,7 @@ func GetViewDiaryData(date string, isLogin bool) ViewDiaryData {
 			Carbohydrates: 0,
 		},
 	}
-	return ViewDiaryData{
+	return ViewDayData{
 		IsLogin: isLogin,
 		Date:    date,
 
