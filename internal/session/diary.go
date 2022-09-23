@@ -4,33 +4,27 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"CountVibe/internal/entities"
+	productSearch "CountVibe/internal/search"
+	"CountVibe/internal/storage"
 )
 
-type orderMeal int64
-
-const (
-	Breakfast orderMeal = iota
-	Lunch
-	Dinner
-	Snacks
-)
-
-func getOrderMeal(button string) orderMeal {
+func getOrderMeal(button string) entities.OrderMeal {
 	switch button {
 	case "addBreakfastItems":
-		return Breakfast
+		return entities.Breakfast
 
 	case "addLunchItems":
-		return Lunch
+		return entities.Lunch
 
 	case "addDinnerItems":
-		return Dinner
+		return entities.Dinner
 
 	case "addSnacksItems":
-		return Snacks
+		return entities.Snacks
 	}
 	return -1
 }
@@ -59,7 +53,7 @@ func saveDateCookie(w http.ResponseWriter, date string) {
 	})
 }
 
-func (s *Session) diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool) error {
+func (s *Session) diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin bool, userID int64) error {
 
 	if isLogin {
 		button := r.FormValue("button")
@@ -76,19 +70,20 @@ func (s *Session) diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin
 				if key == "product_id" {
 
 					strID := value[0]
-					id, err := strconv.ParseInt(strID, 10, 64)
-					if err != nil {
-						return err
-					}
-
 					strAmount := r.FormValue("product_amount:" + strID)
-					amount, err := strconv.ParseFloat(strAmount, 64)
-					if err != nil {
-						return err
-					}
 
 					if strID != "" && strAmount != "" {
-						s.db.AddItem(date, id, amount, int64(od))
+						strOD := strconv.FormatInt(int64(od), 10)
+						strUserID := strconv.FormatInt(userID, 10)
+
+						insertMap := map[string]string{
+							"diary_id":   strUserID,
+							"date":       date,
+							"meal_order": strOD,
+							"product_id": strID,
+							"amount":     strAmount,
+						}
+						s.db.SetPortion(insertMap)
 					}
 				}
 			}
@@ -107,6 +102,81 @@ func (s *Session) diaryFormCheck(w http.ResponseWriter, r *http.Request, isLogin
 	return nil
 }
 
+func parsePrtoduct(m map[string]string) (entities.Product, error) {
+	amountUnit, err1 := strconv.ParseFloat(m["amount_unit"], 64)
+	id, err2 := strconv.ParseInt(m["product_id"], 10, 64)
+	if err1 != nil || err2 != nil {
+		return entities.Product{}, fmt.Errorf("parse product from map", err1, err2)
+	}
+
+	strUnitComp := strings.Split(m["unit_composition"], "/")
+	comp := []float64{0, 0, 0, 0}
+
+	for i := 0; i < 4; i++ {
+		comp[i], _ = strconv.ParseFloat(strUnitComp[i], 64)
+	}
+	return entities.Product{
+		ID:   id,
+		Name: m["name"],
+		UnitComposition: entities.Composition{
+			Calories:      comp[0],
+			Proteins:      comp[1],
+			Fats:          comp[2],
+			Carbohydrates: comp[3],
+		},
+		Unit:       m["unit"],
+		AmountUnit: amountUnit,
+	}, nil
+}
+
+func getMeal(diaryID int64, date string, om entities.OrderMeal, db storage.Storage) (entities.Meal, error) {
+
+	portions := entities.NewPorcions()
+
+	strDiaryID := strconv.FormatInt(diaryID, 10)
+
+	strOM := strconv.FormatInt(int64(om), 10)
+	res, err := db.GetPortions(strDiaryID, date, strOM)
+	if err != nil {
+		return entities.Meal{}, err
+	}
+
+	for _, m := range *res {
+		amount, err := strconv.ParseFloat(m["amount"], 64)
+		if err != nil {
+			return entities.Meal{}, err
+		}
+
+		mapProduct, err := db.GetProduct(m["product_id"])
+		if err != nil {
+			return entities.Meal{}, err
+		}
+		product, err := parsePrtoduct(*mapProduct)
+		if err != nil {
+			return entities.Meal{}, err
+		}
+
+		p := entities.SetPorcion(product, amount)
+		portions = append(portions, p)
+	}
+	m := entities.SetMeal(portions, om)
+
+	return m, nil
+}
+
+func getDayMeals(diaryID int64, date string, db storage.Storage) *entities.DayMeals {
+	meals := entities.NewMeals(4)
+
+	for order := entities.BeginMeal; order <= entities.EndMeal; order++ {
+		getM, err := getMeal(diaryID, date, order, db)
+		if err == nil {
+			meals[order] = getM
+		}
+	}
+	dm := entities.NewDayMeals(meals)
+	return dm
+}
+
 func (s *Session) diaryHandler(w http.ResponseWriter, r *http.Request) {
 
 	isLogin, err := s.compareLogin(r)
@@ -114,17 +184,34 @@ func (s *Session) diaryHandler(w http.ResponseWriter, r *http.Request) {
 		s.Logger.Error(err, "Login verification")
 	}
 
+	var userID int64 = 0
+	username := s.parseUsernameFromURL(r)
+	if username != "" {
+		strUserID, err := s.db.GetUserID(username)
+		if err == nil {
+			getUserID, err := strconv.ParseInt(strUserID, 10, 64)
+			if err == nil {
+				userID = getUserID
+			}
+		}
+	}
+
 	switch r.Method {
 	case "GET":
-
-		date := getDateCookie(r)
-		diaryData := entities.GetViewDiaryData(date, isLogin)
 
 		paths := []string{
 			s.paths["diary"],
 			s.paths["item"],
 			s.paths["product"],
 		}
+
+		search := productSearch.GetSearch()
+
+		date := getDateCookie(r)
+		dm := getDayMeals(userID, date, s.db)
+
+		diaryData := entities.NewViewDayData(date, isLogin, search.Products, dm)
+
 		if err := s.newTemplate(w, diaryData, paths); err != nil {
 			s.Logger.Error(err, "new Template")
 			http.Error(w, "error in create Template", http.StatusInternalServerError)
@@ -135,7 +222,7 @@ func (s *Session) diaryHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "parse form err: %v", err)
 			return
 		}
-		if err := s.diaryFormCheck(w, r, isLogin); err != nil {
+		if err := s.diaryFormCheck(w, r, isLogin, userID); err != nil {
 			s.Logger.Error(err, " Diary Form Check")
 		}
 

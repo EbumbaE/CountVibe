@@ -12,7 +12,10 @@ type UserDatabase interface {
 }
 
 type DiaryDatabase interface {
-	AddItem(date string, id int64, amount float64, od int64) error
+	GetProduct(productID string) (*map[string]string, error)
+	SetProduct(insertMap map[string]string) error
+	GetPortions(diaryID, date, mealOrder string) (*[]map[string]string, error)
+	SetPortion(insertMap map[string]string) error
 }
 
 type Storage interface {

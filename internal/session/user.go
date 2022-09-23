@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"regexp"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
@@ -99,14 +98,7 @@ func (s *Session) newTemplate(w http.ResponseWriter, data any, paths []string) e
 
 func (s *Session) compareLogin(r *http.Request) (bool, error) {
 
-	url := r.URL.Path
-
-	pattern := `/[a-zA-Z0-9]+/`
-	re, _ := regexp.Compile(pattern)
-	res := re.FindAllString(url, -1)
-	firstRes := res[0]
-	lenUsername := len(firstRes)
-	username := firstRes[1 : lenUsername-1]
+	username := s.parseUsernameFromURL(r)
 
 	strPathUserID, err := s.db.GetUserID(username)
 	if err != nil {
