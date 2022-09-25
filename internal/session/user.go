@@ -10,6 +10,10 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+type ViewUserData struct {
+	IsLogin bool
+}
+
 type AuthDetails struct {
 	accessUuid string
 	userID     int64
@@ -23,7 +27,7 @@ type User struct {
 }
 
 func (s *Session) getAuthDetails(r *http.Request) (*AuthDetails, error) {
-	token, err := GetjwtToken(r, s.jwtKey["access"], "access_token")
+	token, err := GetjwtToken(r, s.jwtKey.access, "access_token")
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +110,7 @@ func (s *Session) compareLogin(r *http.Request) (bool, error) {
 	}
 	pathUserID, err := strconv.ParseInt(strPathUserID, 10, 64)
 
-	token, err := GetjwtToken(r, s.jwtKey["access"], "access_token")
+	token, err := GetjwtToken(r, s.jwtKey.access, "access_token")
 	if err != nil {
 		return false, err
 	}

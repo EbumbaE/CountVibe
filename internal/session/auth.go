@@ -27,9 +27,9 @@ func (s *Session) verifyUserPass(username, password string) (bool, error) {
 	return false, nil
 }
 
-func (s *Session) loginVerification(r *http.Request, jwtKey map[string][]byte) (bool, error) {
+func (s *Session) loginVerification(r *http.Request, jwtKey JwtKey) (bool, error) {
 
-	token, err := GetjwtToken(r, jwtKey["access"], "access_token")
+	token, err := GetjwtToken(r, jwtKey.access, "access_token")
 	if err != nil {
 		return false, err
 	}
@@ -188,7 +188,7 @@ func (s *Session) registrationHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Session) refreshHandler(w http.ResponseWriter, r *http.Request) {
 
-	token, err := GetjwtToken(r, s.jwtKey["refresh"], "refresh_token")
+	token, err := GetjwtToken(r, s.jwtKey.refresh, "refresh_token")
 	if err != nil {
 		s.Logger.Error(err, "get jwt token")
 	}

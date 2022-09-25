@@ -1,7 +1,7 @@
 package search
 
 import (
-	"CountVibe/internal/entities"
+	"github.com/EbumbaE/CountVibe/internal/entities"
 )
 
 type search interface {

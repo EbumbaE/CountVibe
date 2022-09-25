@@ -1,5 +1,5 @@
 package psql
 
 type Config struct {
-	Info string
+	Info string `mapstructure:"info"`
 }

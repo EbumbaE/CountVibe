@@ -1,26 +1,30 @@
 package main
 
 import (
-	"CountVibe/internal/certificate"
-	"CountVibe/internal/config"
-	"CountVibe/internal/log"
-	"CountVibe/internal/server"
-	"CountVibe/internal/session"
-	"CountVibe/internal/storage/psql"
+	"github.com/EbumbaE/CountVibe/internal/certificate"
+	"github.com/EbumbaE/CountVibe/internal/config"
+	"github.com/EbumbaE/CountVibe/internal/logger"
+	"github.com/EbumbaE/CountVibe/internal/server"
+	"github.com/EbumbaE/CountVibe/internal/session"
+	"github.com/EbumbaE/CountVibe/internal/storage/psql"
 )
 
 func main() {
 
-	logger, err := log.NewLogger("../../internal/log/l.log")
+	logger, err := logger.NewLogger("../../internal/logger/l.log")
 	if err != nil {
 		panic("Create logger " + err.Error())
 	}
 
-	conf := config.NewConfig()
+	conf, err := config.NewConfig()
+	if err != nil {
+		logger.Error("Parse config: ", err)
+		return
+	}
 
 	db, err := psql.Init(conf.Database)
 	if err != nil {
-		logger.Error("Init database ", err)
+		logger.Error("Init database: ", err)
 	}
 	ok, err := db.CheckHealth()
 	if !ok || err != nil {

@@ -4,17 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"CountVibe/internal/log"
+	"github.com/EbumbaE/CountVibe/internal/logger"
 )
 
 type Server struct {
 	Port   string
 	pages  map[string]string
 	paths  map[string]string
-	Logger log.Logger
+	Logger logger.Logger
 }
 
-func NewServer(c Config, cpages map[string]string, logger log.Logger) *Server {
+func NewServer(c Config, cpages map[string]string, logger logger.Logger) *Server {
 	return &Server{
 		Port:   c.Port,
 		pages:  cpages,
