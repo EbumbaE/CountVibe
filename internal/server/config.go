@@ -1,7 +1,6 @@
 package server
 
 type Config struct {
-	Port  string            `yaml:"port"`
-	Pages map[string]string `yaml:"pages"`
-	Paths map[string]string `yaml:"paths"`
+	Port  string            `mapstructure:"port"`
+	Paths map[string]string `mapstructure:"paths"`
 }

@@ -1,4 +1,4 @@
-package log
+package logger
 
 type Logger interface {
 	Process(...any)

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"CountVibe/internal/entities"
-	productSearch "CountVibe/internal/search"
-	"CountVibe/internal/storage"
+	"github.com/EbumbaE/CountVibe/internal/entities"
+	productSearch "github.com/EbumbaE/CountVibe/internal/search"
+	"github.com/EbumbaE/CountVibe/internal/storage"
 )
 
 func getOrderMeal(button string) entities.OrderMeal {

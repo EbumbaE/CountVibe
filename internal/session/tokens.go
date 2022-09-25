@@ -118,7 +118,7 @@ func (t *Tokens) newRefreshDetails(userID int64, jwtKey []byte) error {
 	return err
 }
 
-func newTokens(userID int64, jwtKey map[string][]byte) (*Tokens, error) {
+func newTokens(userID int64, jwtKey JwtKey) (*Tokens, error) {
 
 	access := Details{
 		expires: time.Now().Add(time.Minute * 5).Unix(),
@@ -135,10 +135,10 @@ func newTokens(userID int64, jwtKey map[string][]byte) (*Tokens, error) {
 		access:  access,
 		refresh: refresh,
 	}
-	if err := t.newAcessDetails(userID, jwtKey["access"]); err != nil {
+	if err := t.newAcessDetails(userID, jwtKey.access); err != nil {
 		return nil, err
 	}
-	if err := t.newRefreshDetails(userID, jwtKey["refresh"]); err != nil {
+	if err := t.newRefreshDetails(userID, jwtKey.refresh); err != nil {
 		return nil, err
 	}
 

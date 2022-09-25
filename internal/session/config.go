@@ -1,11 +1,12 @@
 package session
 
-type Config struct {
-	Paths        map[string]string
-	FormatsPages map[string]string
-	JwtKey       map[string][]byte
+type ConfigJwtKey struct {
+	Access  string `mapstructure:"access"`
+	Refresh string `mapstructure:"refresh"`
 }
 
-type ViewUserData struct {
-	IsLogin bool
+type Config struct {
+	Paths        map[string]string `mapstructure:"paths"`
+	FormatsPages map[string]string `mapstructure:"formatsPages"`
+	JwtKey       ConfigJwtKey      `mapstructure:"jwtKey"`
 }

@@ -8,28 +8,36 @@ import (
 
 	"github.com/go-redis/redis/v7"
 
-	"CountVibe/internal/log"
-	"CountVibe/internal/storage"
+	"github.com/EbumbaE/CountVibe/internal/logger"
+	"github.com/EbumbaE/CountVibe/internal/storage"
 )
+
+type JwtKey struct {
+	access  []byte
+	refresh []byte
+}
 
 type Session struct {
 	pages        map[string]string
 	paths        map[string]string
 	formatsPages map[string]string
-	jwtKey       map[string][]byte
+	jwtKey       JwtKey
 
 	idGenerator IDGenerator
-	Logger      log.Logger
+	Logger      logger.Logger
 	tokensDB    *redis.Client
 	db          storage.Storage
 }
 
-func NewSession(c Config, confpages map[string]string, db storage.Storage, logger log.Logger) *Session {
+func NewSession(c Config, confpages map[string]string, db storage.Storage, logger logger.Logger) *Session {
 	return &Session{
 		pages:        confpages,
 		paths:        c.Paths,
 		formatsPages: c.FormatsPages,
-		jwtKey:       c.JwtKey,
+		jwtKey: JwtKey{
+			access:  []byte(c.JwtKey.Access),
+			refresh: []byte(c.JwtKey.Refresh),
+		},
 
 		idGenerator: IDGenerator{id: 0},
 		Logger:      logger,
