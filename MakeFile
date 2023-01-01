@@ -1,0 +1,21 @@
+PROJECT := github.com/EbumbaE/CountVibe
+PKG_SERVER := ${PROJECT}/cmd/server
+
+all: build
+
+build: 
+	go build -o bin/server/server.exe ${PKG_SERVER}
+test:
+	go test ./...
+
+redis:
+	cd pkg/redis && docker compose up
+
+database:
+	cd pkg/database_cv && docker compose up
+	goose postgres "user=Ebumba password=1234 dbname=abobus sslmode=disable" up
+
+pull:
+	go install github.com/pressly/goose/v3/cmd/goose@latest
+	docker pull redis
+	docker pull postgres

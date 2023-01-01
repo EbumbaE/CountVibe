@@ -7,7 +7,7 @@ import (
 func (d *Postgres) InsertNewUser(id, username, password string) error {
 	driverConn := d.driverConn
 
-	dbRequest := `INSERT INTO users (id, username, password) VALUES ($1, $2, $3)`
+	dbRequest := `INSERT INTO users (user_id, username, password) VALUES ($1, $2, $3)`
 	_, err := driverConn.Exec(dbRequest, id, username, password)
 
 	return err
@@ -16,7 +16,7 @@ func (d *Postgres) InsertNewUser(id, username, password string) error {
 func (d *Postgres) GetUsername(userID string) (string, error) {
 	driverConn := d.driverConn
 
-	dbRequest := `SELECT id, username FROM users WHERE id=$1`
+	dbRequest := `SELECT user_id, username FROM users WHERE user_id=$1`
 	var username string = ""
 	err := driverConn.QueryRow(dbRequest, userID).Scan(&userID, &username)
 
@@ -30,7 +30,7 @@ func (d *Postgres) GetUsername(userID string) (string, error) {
 func (d *Postgres) GetUserID(username string) (string, error) {
 	driverConn := d.driverConn
 
-	dbRequest := `SELECT id, username FROM users WHERE username=$1`
+	dbRequest := `SELECT user_id, username FROM users WHERE username=$1`
 	var userID string = ""
 	err := driverConn.QueryRow(dbRequest, username).Scan(&userID, &username)
 
@@ -44,7 +44,7 @@ func (d *Postgres) GetUserID(username string) (string, error) {
 func (d *Postgres) GetLastUserID() (string, error) {
 	driverConn := d.driverConn
 
-	dbRequest := `SELECT id FROM users ORDER BY id DESC LIMIT 1`
+	dbRequest := `SELECT user_id FROM users ORDER BY user_id DESC LIMIT 1`
 	var userID string = ""
 	err := driverConn.QueryRow(dbRequest).Scan(&userID)
 
